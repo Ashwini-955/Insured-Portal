@@ -1,0 +1,23 @@
+[
+  {
+    "claimNumber": "CFPD000201-00-02182026-01",
+    "policyNumber": "FPP2000002139-00",
+    "accountId": "ACC-001",
+    "title": "Mold Damage",
+    "status": "Open",
+    "lossDate": "2026-02-18",
+    "filedDate": "2026-02-18",
+    "descriptionOfLoss": "Mold damage found in property",
+    "amountClaimed": 12,
+    "amountPaid": 10,
+    "adjuster": {
+      "name": "Sushil Singh",
+      "phone": "(876) 888-6868",
+      "email": "ssingh@cogitate.us"
+    },
+    "recentActivity": [
+      { "date": "2026-02-18", "action": "Claim filed" },
+      { "date": "2026-02-19", "action": "Assigned to adjuster Sushil Singh" }
+    ]
+  }
+]

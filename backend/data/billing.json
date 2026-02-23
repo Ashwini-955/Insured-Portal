@@ -1,0 +1,56 @@
+[
+  {
+    "billingId": "BIL-ACC001-001",
+    "policyNumber": "FPP1900008896-00",
+    "accountId": "ACC-001",
+    "payPlanDesc": "Monthly - NB",
+    "isAutoPay": true,
+    "totalAccountBalance": 12765.79,
+    "currentAmountDue": 1894.58,
+    "currentDueDate": "2026-02-15",
+    "projectedStatements": [
+      {
+        "status": "Paid",
+        "statementDate": "2025-10-31",
+        "dueDate": "2025-10-31",
+        "totalAmountDue": 4178.64,
+        "amountPaid": 4178.64
+      },
+      {
+        "status": "Paid",
+        "statementDate": "2025-12-12",
+        "dueDate": "2025-12-15",
+        "totalAmountDue": 1361.55,
+        "amountPaid": 1361.55
+      },
+      {
+        "status": "Paid",
+        "statementDate": "2026-01-12",
+        "dueDate": "2026-01-15",
+        "totalAmountDue": 1361.55,
+        "amountPaid": 1361.55
+      },
+      {
+        "status": "Due",
+        "statementDate": "2026-02-12",
+        "dueDate": "2026-02-15",
+        "totalAmountDue": 1894.58,
+        "amountPaid": 0
+      },
+      {
+        "status": "Future",
+        "statementDate": "2026-03-12",
+        "dueDate": "2026-03-15",
+        "totalAmountDue": 1564.44,
+        "amountPaid": 0
+      },
+      {
+        "status": "Future",
+        "statementDate": "2026-04-12",
+        "dueDate": "2026-04-15",
+        "totalAmountDue": 1564.44,
+        "amountPaid": 0
+      }
+    ]
+  }
+]
