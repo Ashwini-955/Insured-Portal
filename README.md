@@ -39,4 +39,3 @@ You should see:
 MongoDB Connected: cluster0.xxxxx.mongodb.net
 Server running on port 5000
 ```
-
