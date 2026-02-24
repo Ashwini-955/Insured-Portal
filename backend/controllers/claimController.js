@@ -1,6 +1,5 @@
 const Claim = require('../models/Claim');
 
-// API to Get all claims by policyNumber
 const getClaimsByPolicy = async (req, res) => {
   try {
     const { policyNumber } = req.params;

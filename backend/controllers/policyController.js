@@ -1,6 +1,5 @@
 const Policy = require('../models/Policy');
 
-// API to Get all policies by accountId
 const getPoliciesByAccount = async (req, res) => {
   try {
     const { accountId } = req.params;
