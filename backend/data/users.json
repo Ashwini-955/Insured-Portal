@@ -1,0 +1,26 @@
+[
+  {
+    "userId": "USR-001",
+    "accountId": "ACC-001",
+    "firstName": "Narotam",
+    "lastName": "Singh",
+    "email": "nsingh@cogitate.us",
+    "password": "hashed_password_here",
+    "phone": "8888888888",
+    "policyNumbers": ["FPP2000002139-00", "FPP1900008896-00"],
+    "isActive": true,
+    "createdAt": "2025-10-01"
+  },
+  {
+    "userId": "USR-002",
+    "accountId": "ACC-002",
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "email": "janedoe@email.com",
+    "password": "hashed_password_here",
+    "phone": "9999999999",
+    "policyNumbers": ["FPP1900008897-00"],
+    "isActive": true,
+    "createdAt": "2025-11-01"
+  }
+]
