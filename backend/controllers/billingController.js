@@ -1,10 +1,11 @@
 const Billing = require('../models/Billing');
 
-// API to Get billing info by policyNumber
+// Get billing info by policyNumber
 const getBillingByPolicy = async (req, res) => {
   try {
     const { policyNumber } = req.params;
-    const billing = await Billing.findOne({ policyNumber });
+    const billing = await Billing.findOne({ policyNumber })
+    .select('billingId payPlanDesc totalAccountBalance currentAmountDue currentDueDate');
     if (!billing) {
       return res.status(404).json({
         success: false,
@@ -13,6 +14,7 @@ const getBillingByPolicy = async (req, res) => {
     }
     res.status(200).json({
       success: true,
+      count: billing?1:0,
       data: billing
     });
   } catch (error) {
