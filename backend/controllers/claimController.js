@@ -3,8 +3,8 @@ const Claim = require('../models/Claim');
 const getClaimsByPolicy = async (req, res) => {
   try {
     const { policyNumber } = req.params;
-
-    const claims = await Claim.find({ policyNumber });
+    const claims = await Claim.find({ policyNumber })
+    .select('claimNumber claimAmount amountClaimed amountPaid');
 
     if (!claims || claims.length === 0) {
       return res.status(404).json({ 
