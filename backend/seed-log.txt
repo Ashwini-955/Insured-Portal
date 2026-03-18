@@ -1,0 +1,42 @@
+[dotenv@17.3.1] injecting env (3) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+MongoDB Connected: ac-5tc1p9a-shard-00-02.qr8tyuh.mongodb.net
+Cleared existing data.
+Error seeding data: MongoBulkWriteError: E11000 duplicate key error collection: test.users index: userId_1 dup key: { userId: null }
+    at OrderedBulkOperation.handleWriteError (C:\Insured_Portal\backend\node_modules\mongodb\lib\bulk\common.js:802:19)
+    at executeCommands (C:\Insured_Portal\backend\node_modules\mongodb\lib\bulk\common.js:346:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async C:\Insured_Portal\backend\node_modules\mongodb\lib\bulk\common.js:788:24
+    at async MongoClient.withSession (C:\Insured_Portal\backend\node_modules\mongodb\lib\mongo_client.js:469:20)
+    at async OrderedBulkOperation.execute (C:\Insured_Portal\backend\node_modules\mongodb\lib\bulk\common.js:787:20)
+    at async Collection.bulkWrite (C:\Insured_Portal\backend\node_modules\mongodb\lib\collection.js:224:16)
+    at async Collection.insertMany (C:\Insured_Portal\backend\node_modules\mongodb\lib\collection.js:171:25)
+    at async Function.insertMany (C:\Insured_Portal\backend\node_modules\mongoose\lib\model.js:3085:11)
+    at async seedData (C:\Insured_Portal\backend\seed.js:26:23) {
+  errorLabelSet: Set(0) {},
+  errorResponse: {
+    message: 'E11000 duplicate key error collection: test.users index: userId_1 dup key: { userId: null }',
+    code: 11000,
+    writeErrors: [ [Object] ]
+  },
+  code: 11000,
+  writeErrors: [ { err: [Object], index: 1 } ],
+  result: BulkWriteResult {
+    insertedCount: 1,
+    matchedCount: 0,
+    modifiedCount: 0,
+    deletedCount: 0,
+    upsertedCount: 0,
+    upsertedIds: {},
+    insertedIds: { '0': new ObjectId('69a7d7196132522a192f9f68') }
+  },
+  insertedDocs: [
+    {
+      email: 'john@example.com',
+      name: 'John Doe',
+      ssoId: 'sso-123',
+      _id: new ObjectId('69a7d7196132522a192f9f68'),
+      createdAt: 2026-03-04T06:54:17.748Z,
+      __v: 0
+    }
+  ]
+}
