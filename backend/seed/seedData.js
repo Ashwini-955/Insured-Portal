@@ -22,19 +22,19 @@ const seedDB = async () => {
     await Policy.deleteMany({});
     await Claim.deleteMany({});
     await Billing.deleteMany({});
-    console.log(' Old data cleared');
+    console.log('Old data cleared');
 
     await User.insertMany(users);
     await Policy.insertMany(policies);
     await Claim.insertMany(claims);
     await Billing.insertMany(billing);
-    console.log(' All data seeded successfully!');
+    console.log('All data seeded successfully!');
 
     mongoose.connection.close();
-    console.log(' Connection closed');
+    console.log('Connection closed');
 
   } catch (error) {
-    console.error(' Error seeding data:', error);
+    console.error('Error seeding data:', error);
     process.exit(1);
   }
 };
