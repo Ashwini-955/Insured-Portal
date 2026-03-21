@@ -1,36 +1,22 @@
 'use client';
 
 import Link from 'next/link';
+import { useMemo } from 'react';
 import { formatDate } from '@/utils/formatDate';
 import type { Claim } from '@/types';
-import { useAuth } from '@/context/AuthContext';
-import { getClaimsByEmail } from '@/lib/api';
-import { useEffect, useMemo, useState } from 'react';
 
 const PENDING = ['Pending', 'Pending Review', 'Submitted', 'Open', 'Under Review'];
 
-export function PendingClaimsCard({ claims }: { claims?: Claim[] }) {
-  const { user } = useAuth();
-  const [data, setData] = useState<Claim[] | null>(claims ?? null);
-  const [isLoading, setIsLoading] = useState<boolean>(!claims);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (claims) return;
-    if (!user?.email) return;
-
-    let cancelled = false;
-    setIsLoading(true);
-    setError(null);
-    getClaimsByEmail(user.email)
-      .then((rows) => { if (!cancelled) setData(rows); })
-      .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load claims'); })
-      .finally(() => { if (!cancelled) setIsLoading(false); });
-
-    return () => { cancelled = true; };
-  }, [claims, user?.email]);
-
-  const pending = useMemo(() => (data ?? []).filter((c) => PENDING.includes(c.status ?? '')), [data]);
+export function PendingClaimsCard({
+  claims = [],
+  isLoading,
+  error,
+}: {
+  claims?: Claim[];
+  isLoading?: boolean;
+  error?: string | null;
+}) {
+  const pending = useMemo(() => (claims ?? []).filter((c) => PENDING.includes(c.status ?? '')), [claims]);
   return (
     <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 sm:p-5 min-h-[220px]">
       <div className="flex items-center justify-between mb-3">

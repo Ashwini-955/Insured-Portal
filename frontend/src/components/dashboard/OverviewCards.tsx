@@ -1,85 +1,47 @@
 'use client';
 
 import Link from 'next/link';
+import { useMemo } from 'react';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDate } from '@/utils/formatDate';
 import type { Policy, Claim, Billing } from '@/types';
-import { useAuth } from '@/context/AuthContext';
-import { getBillingByEmail, getClaimsByEmail, getPoliciesByEmail } from '@/lib/api';
-import { useEffect, useMemo, useState } from 'react';
 
 export function OverviewCards({
-  policies,
-  claims,
-  billing,
+  policies = [],
+  claims = [],
+  billing = [],
+  isLoading,
+  error,
 }: {
   policies?: Policy[];
   claims?: Claim[];
   billing?: Billing[];
+  isLoading?: boolean;
+  error?: string | null;
 }) {
-  const { user } = useAuth();
-  const [pData, setPData] = useState<Policy[] | null>(policies ?? null);
-  const [cData, setCData] = useState<Claim[] | null>(claims ?? null);
-  const [bData, setBData] = useState<Billing[] | null>(billing ?? null);
-  const [isLoading, setIsLoading] = useState<boolean>(!(policies && claims && billing));
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (policies && claims && billing) return;
-    if (!user?.email) return;
-
-    let cancelled = false;
-    setIsLoading(true);
-    setError(null);
-
-    Promise.all([
-      policies ? Promise.resolve(policies) : getPoliciesByEmail(user.email),
-      claims ? Promise.resolve(claims) : getClaimsByEmail(user.email),
-      billing ? Promise.resolve(billing) : getBillingByEmail(user.email),
-    ])
-      .then(([pp, cc, bb]) => {
-        if (cancelled) return;
-        setPData(pp);
-        setCData(cc);
-        setBData(bb);
-      })
-      .catch((e) => {
-        if (cancelled) return;
-        setError(e instanceof Error ? e.message : 'Failed to load overview');
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setIsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [policies, claims, billing, user?.email]);
-
   const active = useMemo(
-    () => (pData ?? []).filter((p) => (p.status ?? '').toLowerCase() === 'active'),
-    [pData]
+    () => (policies ?? []).filter((p) => (p.status ?? '').toLowerCase() === 'active'),
+    [policies]
   );
   const open = useMemo(
-    () => (cData ?? []).filter((c) => !['Approved', 'Rejected', 'Closed'].includes(c.status ?? '')),
-    [cData]
+    () => (claims ?? []).filter((c) => !['Approved', 'Rejected', 'Closed'].includes(c.status ?? '')),
+    [claims]
   );
   const totalDue = useMemo(
-    () => (bData ?? []).reduce((s, b) => s + (b.currentAmountDue ?? 0), 0),
-    [bData]
+    () => (billing ?? []).reduce((s, b) => s + (b.currentAmountDue ?? 0), 0),
+    [billing]
   );
   const nextRenewal = useMemo(
     () => active.map((p) => p.expirationDate).filter(Boolean).sort()[0],
     [active]
   );
   const nextPayment = useMemo(
-    () => (bData ?? []).flatMap((b) => b.projectedStatements ?? []).map((s) => s.dueDate).filter(Boolean).sort()[0],
-    [bData]
+    () => (billing ?? []).flatMap((b) => b.projectedStatements ?? []).map((s) => s.dueDate).filter(Boolean).sort()[0],
+    [billing]
   );
   const lastClaim = useMemo(
-    () => (cData ?? []).map((c) => c.filedDate).filter(Boolean).sort().reverse()[0],
-    [cData]
+    () => (claims ?? []).map((c) => c.filedDate).filter(Boolean).sort().reverse()[0],
+    [claims]
   );
 
   return (
