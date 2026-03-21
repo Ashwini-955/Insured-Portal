@@ -39,6 +39,7 @@ You should see:
 MongoDB Connected: cluster0.xxxxx.mongodb.net
 Server running on port 5000
 ```
+```
 🔌 API Overview
 POST /api/auth/login
 Authenticates user using email and returns JWT token + user details.
@@ -48,3 +49,4 @@ GET /api/claims?policyNumbers=...
 Retrieves claims data for given policy numbers.
 GET /api/billing?policyNumbers=...
 Retrieves billing details (dues, payments) for given policy numbers.
+```
