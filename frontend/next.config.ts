@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactStrictMode: false, // prevents double-mount in dev (duplicate API calls)
 };
 
 export default nextConfig;

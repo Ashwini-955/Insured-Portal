@@ -1,36 +1,22 @@
 'use client';
 
 import Link from 'next/link';
+import { useMemo } from 'react';
 import { formatCurrency } from '@/utils/formatCurrency';
 import type { Billing } from '@/types';
-import { useAuth } from '@/context/AuthContext';
-import { getBillingByEmail } from '@/lib/api';
-import { useEffect, useMemo, useState } from 'react';
 
-export function UpcomingPaymentsCard({ billing }: { billing?: Billing[] }) {
-  const { user } = useAuth();
-  const [data, setData] = useState<Billing[] | null>(billing ?? null);
-  const [isLoading, setIsLoading] = useState<boolean>(!billing);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (billing) return;
-    if (!user?.email) return;
-
-    let cancelled = false;
-    setIsLoading(true);
-    setError(null);
-    getBillingByEmail(user.email)
-      .then((rows) => { if (!cancelled) setData(rows); })
-      .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load billing'); })
-      .finally(() => { if (!cancelled) setIsLoading(false); });
-
-    return () => { cancelled = true; };
-  }, [billing, user?.email]);
-
+export function UpcomingPaymentsCard({
+  billing = [],
+  isLoading,
+  error,
+}: {
+  billing?: Billing[];
+  isLoading?: boolean;
+  error?: string | null;
+}) {
   const list = useMemo(() => {
     const items: { id: string; due: string; amount: number; status: string }[] = [];
-    (data ?? []).forEach((b) => {
+    (billing ?? []).forEach((b) => {
     if (b.currentAmountDue != null && b.currentDueDate) {
       items.push({ id: b.billingId || b.policyNumber, due: b.currentDueDate, amount: b.currentAmountDue, status: 'Due' });
     }
@@ -41,7 +27,7 @@ export function UpcomingPaymentsCard({ billing }: { billing?: Billing[] }) {
     });
     });
     return items.slice(0, 5);
-  }, [data]);
+  }, [billing]);
   return (
     <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 sm:p-5 min-h-[220px]">
       <div className="flex items-center justify-between mb-3">
