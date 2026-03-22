@@ -1,7 +1,4 @@
 const User = require('../models/User');
-const Policy = require('../models/Policy');
-const Claim = require('../models/Claim');
-const Billing = require('../models/Billing');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'insured-portal-secret-key';
@@ -9,10 +6,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'insured-portal-secret-key';
 /**
  * POST /api/auth/login
  * Input:  { email }
- * Output: { success, token, user, policies, claims, billing }
+ * Output: { success, token, user }
  *
- * Uses EMAIL only - no accountId in API.
- * Policies/claims/billing are fetched by matching insured.email in policies.
+ * Policies, claims, billing are fetched separately:
+ * 1) GET /api/policies/email/:email
+ * 2) GET /api/claims?policyNumbers=...
+ * 3) GET /api/billing?policyNumbers=...
  */
 const login = async (req, res) => {
   try {
@@ -25,8 +24,7 @@ const login = async (req, res) => {
       });
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
-    const escapedEmail = normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapedEmail = email.trim().toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
     // 1. Find user by email
     const user = await User.findOne({ email: { $regex: new RegExp(`^${escapedEmail}$`, 'i') } });
@@ -44,25 +42,7 @@ const login = async (req, res) => {
       });
     }
 
-    // 2. Fetch policies by insured.email (email-based lookup - no accountId)
-    const policies = await Policy.find({ 'insured.email': { $regex: new RegExp(`^${escapedEmail}$`, 'i') } })
-      .select('-__v')
-      .lean();
-
-    const policyNumbers = policies.map(p => p.policyNumber);
-
-    // 3. Fetch claims for these policies
-    const claims = policyNumbers.length > 0
-      ? await Claim.find({ policyNumber: { $in: policyNumbers } }).select('-__v').lean()
-      : [];
-
-    // 4. Fetch billing for these policies
-    const billing = policyNumbers.length > 0
-      ? await Billing.find({ policyNumber: { $in: policyNumbers } }).select('-__v').lean()
-      : [];
-
-    // 5. Generate JWT
-    // expiration can be shortened by setting JWT_EXPIRES in your .env (e.g. '1h' or '30m')
+    // 2. Generate JWT
     const token = jwt.sign(
       { userId: user._id, email: user.email },
       JWT_SECRET,
@@ -76,10 +56,7 @@ const login = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email
-      },
-      policies,
-      claims,
-      billing
+      }
     });
 
   } catch (error) {

@@ -38,7 +38,4 @@ export interface LoginResponse {
   success: boolean;
   token: string;
   user: User;
-  policies: Policy[];
-  claims: Claim[];
-  billing: Billing[];
 }

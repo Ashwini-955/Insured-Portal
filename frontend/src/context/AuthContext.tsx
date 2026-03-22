@@ -3,14 +3,11 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { loginWithEmail } from '@/lib/api';
-import type { LoginResponse, User, Policy, Claim, Billing } from '@/types';
+import type { LoginResponse, User } from '@/types';
 
 interface AuthState {
   user: User | null;
   token: string | null;
-  policies: Policy[];
-  claims: Claim[];
-  billing: Billing[];
   isLoading: boolean;
   isAuthenticated: boolean;
 }
@@ -27,7 +24,7 @@ const STORAGE_KEY = 'insured_portal_auth';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>({
-    user: null, token: null, policies: [], claims: [], billing: [],
+    user: null, token: null,
     isLoading: true, isAuthenticated: false,
   });
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +38,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const data = JSON.parse(stored);
         setState({
           user: data.user, token: data.token,
-          policies: data.policies || [], claims: data.claims || [], billing: data.billing || [],
           isLoading: false, isAuthenticated: !!data.token,
         });
         return;
@@ -62,12 +58,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (typeof window !== 'undefined') {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
           user: data.user, token: data.token,
-          policies: data.policies, claims: data.claims, billing: data.billing,
         }));
       }
       setState({
         user: data.user, token: data.token,
-        policies: data.policies, claims: data.claims, billing: data.billing,
         isLoading: false, isAuthenticated: true,
       });
       router.push('/dashboard');
@@ -81,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEY);
     setState({
-      user: null, token: null, policies: [], claims: [], billing: [],
+      user: null, token: null,
       isLoading: false, isAuthenticated: false,
     });
     router.push('/login');
