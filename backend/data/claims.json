@@ -1,23 +1,46 @@
 [
   {
-    "claimNumber": "CFPD000201-00-02182026-01",
-    "policyNumber": "FPP2000002139-00",
-    "accountId": "ACC-001",
-    "title": "Mold Damage",
-    "status": "Open",
-    "lossDate": "2026-02-18",
-    "filedDate": "2026-02-18",
-    "descriptionOfLoss": "Mold damage found in property",
-    "amountClaimed": 12,
-    "amountPaid": 10,
-    "adjuster": {
-      "name": "Sushil Singh",
-      "phone": "(876) 888-6868",
-      "email": "ssingh@cogitate.us"
-    },
-    "recentActivity": [
-      { "date": "2026-02-18", "action": "Claim filed" },
-      { "date": "2026-02-19", "action": "Assigned to adjuster Sushil Singh" }
+    "ClaimNumber": "CFPD000201-00-02182026-01",
+    "PolicyNumber": "FPP2000002139-00",
+    "Status": "Open",
+    "LossDate": "2026-02-18T00:00:00",
+    "ReceivedDate": "2026-02-18T00:00:00",
+    "DescriptionOfLoss": "Mold damage found in property",
+    "AccidentCode": "Mold Damage",
+    "PaidLoss": 10,
+    "MainAdjusterName": "Sushil Singh",
+    "Phone": "(876) 888-6868",
+    "Email": "ssingh@cogitate.us",
+    "ReserveDetails": [
+      {
+        "LossRes": 12,
+        "LossesPaid": 10,
+        "AdjusterName": "Sushil Singh",
+        "AdjusterPhone": "(876) 888-6868",
+        "AdjusterEmail": "ssingh@cogitate.us"
+      }
+    ]
+  },
+  {
+    "ClaimNumber": "CFPD000888-00-03222026-01",
+    "PolicyNumber": "FPP1900008896-00",
+    "Status": "Pending Review",
+    "LossDate": "2026-03-20T00:00:00",
+    "ReceivedDate": "2026-03-22T00:00:00",
+    "DescriptionOfLoss": "Storm damage to roof",
+    "AccidentCode": "Wind/Hail",
+    "PaidLoss": 0,
+    "MainAdjusterName": "Alice Johnson",
+    "Phone": "(555) 123-4567",
+    "Email": "ajohnson@cogitate.us",
+    "ReserveDetails": [
+      {
+        "LossRes": 5000,
+        "LossesPaid": 0,
+        "AdjusterName": "Alice Johnson",
+        "AdjusterPhone": "(555) 123-4567",
+        "AdjusterEmail": "ajohnson@cogitate.us"
+      }
     ]
   }
 ]

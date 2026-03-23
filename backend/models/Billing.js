@@ -1,14 +1,12 @@
 const mongoose = require('mongoose');
 
 const billingSchema = new mongoose.Schema({
-  billingId:           { type: String },
-  policyNumber:        { type: String, required: true },
-  accountId:           { type: String },
-  payPlanDesc:         { type: String },
-  isAutoPay:           { type: Boolean },
-  totalAccountBalance: { type: Number },
-  currentAmountDue:    { type: Number },
-  currentDueDate:      { type: String },
+  PolicyNumber: { type: String, required: true },
+  payPlanDesc: { type: String },
+  isRecurringPayment: { type: Boolean },
+  accountTotalBalance: { type: Number },
+  currentDueDate: { type: String },
+  currentAmountDue: { type: Number },
   projectedStatements: { type: Array }
 });
 

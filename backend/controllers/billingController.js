@@ -10,7 +10,7 @@ const getBillingByPolicyNumbers = async (req, res) => {
       return res.status(200).json({ success: true, count: 0, data: [] });
     }
 
-    const billing = await Billing.find({ policyNumber: { $in: policyNumbers } })
+    const billing = await Billing.find({ PolicyNumber: { $in: policyNumbers } })
       .select('-__v')
       .lean();
 
