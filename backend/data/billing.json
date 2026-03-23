@@ -1,55 +1,59 @@
 [
   {
-    "billingId": "BIL-ACC001-001",
-    "policyNumber": "FPP1900008896-00",
-    "accountId": "ACC-001",
+    "PolicyNumber": "FPP1900008896-00",
     "payPlanDesc": "Monthly - NB",
-    "isAutoPay": true,
-    "totalAccountBalance": 12765.79,
-    "currentAmountDue": 1894.58,
-    "currentDueDate": "2026-02-15",
+    "isRecurringPayment": true,
+    "accountTotalBalance": 12765.79,
+    "currentDueDate": null,
+    "currentAmountDue": 0,
     "projectedStatements": [
       {
         "status": "Paid",
-        "statementDate": "2025-10-31",
-        "dueDate": "2025-10-31",
-        "totalAmountDue": 4178.64,
-        "amountPaid": 4178.64
+        "policy": "FPP1900008896-00",
+        "statementDate": "2025-10-31T00:00:00",
+        "statementDueDate": "2025-10-31T00:00:00",
+        "statementTotalAmountDue": 4178.64,
+        "statementDurationPaid": 4178.64
       },
       {
         "status": "Paid",
-        "statementDate": "2025-12-12",
-        "dueDate": "2025-12-15",
-        "totalAmountDue": 1361.55,
-        "amountPaid": 1361.55
+        "policy": "FPP1900008896-00",
+        "statementDate": "2025-12-12T00:00:00",
+        "statementDueDate": "2025-12-15T00:00:00",
+        "statementTotalAmountDue": 1361.55,
+        "statementDurationPaid": 1361.55
       },
       {
         "status": "Paid",
-        "statementDate": "2026-01-12",
-        "dueDate": "2026-01-15",
-        "totalAmountDue": 1361.55,
-        "amountPaid": 1361.55
-      },
-      {
-        "status": "Due",
-        "statementDate": "2026-02-12",
-        "dueDate": "2026-02-15",
-        "totalAmountDue": 1894.58,
-        "amountPaid": 0
+        "policy": "FPP1900008896-00",
+        "statementDate": "2026-01-12T00:00:00",
+        "statementDueDate": "2026-01-15T00:00:00",
+        "statementTotalAmountDue": 1361.55,
+        "statementDurationPaid": 1361.55
       },
       {
         "status": "Future",
-        "statementDate": "2026-03-12",
-        "dueDate": "2026-03-15",
-        "totalAmountDue": 1564.44,
-        "amountPaid": 0
+        "policy": "FPP1900008896-00",
+        "statementDate": "2026-02-12T00:00:00",
+        "statementDueDate": "2026-02-15T00:00:00",
+        "statementTotalAmountDue": 1894.58,
+        "statementDurationPaid": 0
       },
       {
         "status": "Future",
-        "statementDate": "2026-04-12",
-        "dueDate": "2026-04-15",
-        "totalAmountDue": 1564.44,
-        "amountPaid": 0
+        "policy": "FPP1900008896-00",
+        "statementDate": "2026-03-12T00:00:00",
+        "statementDueDate": "2026-03-15T00:00:00",
+        "statementTotalAmountDue": 1564.44,
+        "statementDurationPaid": 0
+      },
+      {
+        "status": "Future",
+        "policy": "FPP1900008896-00",
+        "statementDate": "2026-04-12T00:00:00",
+        "statementDueDate": "2026-04-15T00:00:00",
+        "statementTotalAmountDue": 1564.44,
+        "statementDurationPaid": 0
       }
     ]
   }

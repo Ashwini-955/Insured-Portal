@@ -10,7 +10,7 @@ const getClaimsByPolicyNumbers = async (req, res) => {
       return res.status(200).json({ success: true, count: 0, data: [] });
     }
 
-    const claims = await Claim.find({ policyNumber: { $in: policyNumbers } })
+    const claims = await Claim.find({ PolicyNumber: { $in: policyNumbers } })
       .select('-__v')
       .lean();
 
