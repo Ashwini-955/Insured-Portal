@@ -173,5 +173,77 @@
         "FormType": "PDF"
       }
     ]
+  },
+  {
+    "PolicyNumber": "FPP2025001234-00",
+    "AccountId": "ACC-001",
+    "PolicyStatus": "Pending",
+    "EffectiveDate": "2026-05-01",
+    "ExpirationDate": "2027-05-01",
+    "Transaction": {
+      "Type": "New Business",
+      "Date": "2026-03-23",
+      "Reason": ""
+    },
+    "TransactionHistory": [
+      {
+        "Type": "New Business",
+        "Date": "2026-03-23",
+        "AnnualPremium": 12500.00
+      }
+    ],
+    "ClientInformation": {
+      "FirstName": "Narotam",
+      "LastName": "Singh",
+      "Communications": [
+        {
+          "Type": "PhNo",
+          "Value": "8888888888"
+        },
+        {
+          "Type": "Email",
+          "Value": "nsingh@cogitate.us"
+        }
+      ],
+      "BusinessInfo": {
+        "Locations": [
+          {
+            "Address": {
+              "AddressLine1": "99 Commercial Blvd",
+              "City": "Atlanta",
+              "State": "GA",
+              "Zip": "30303"
+            }
+          }
+        ]
+      }
+    },
+    "Agent": {
+      "Name": "Sarah Jenkins",
+      "Communications": [
+        {
+          "Type": "PhNo",
+          "Value": "555-999-1111"
+        },
+        {
+          "Type": "Email",
+          "Value": "sjenkins@cogitate.us"
+        }
+      ]
+    },
+    "Carrier": {
+      "Name": "Commercial Standard Insurance"
+    },
+    "PolicyCoverages": {
+      "Coverages": [
+        {
+          "Description": "Commercial General Liability",
+          "Limit": 2000000,
+          "Deductible": 5000,
+          "IsSelected": true
+        }
+      ]
+    },
+    "Forms": []
   }
 ]

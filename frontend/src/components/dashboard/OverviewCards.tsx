@@ -20,7 +20,7 @@ export function OverviewCards({
   error?: string | null;
 }) {
   const active = useMemo(
-    () => (policies ?? []).filter((p) => (p.PolicyStatus ?? '').toLowerCase() === 'active'),
+    () => (policies ?? []).filter((p) => (p.status ?? '').toLowerCase() === 'active'),
     [policies]
   );
   const open = useMemo(
@@ -32,7 +32,7 @@ export function OverviewCards({
     [billing]
   );
   const nextRenewal = useMemo(
-    () => active.map((p) => p.ExpirationDate).filter(Boolean).sort()[0],
+    () => active.map((p) => p.expirationDate).filter(Boolean).sort()[0],
     [active]
   );
   const nextPayment = useMemo(

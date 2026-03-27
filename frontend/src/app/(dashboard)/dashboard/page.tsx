@@ -40,7 +40,7 @@ export default function DashboardPage() {
         if (cancelled) return;
 
         setPolicies(p);
-        const policyNumbers = p.map((x) => x.PolicyNumber).filter(Boolean);
+        const policyNumbers = p.map((x) => x.policyNumber).filter(Boolean);
 
         if (policyNumbers.length === 0) {
           setClaims([]);

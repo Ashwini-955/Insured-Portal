@@ -12,6 +12,8 @@ const claimSchema = new mongoose.Schema({
   MainAdjusterName: { type: String },
   Phone: { type: String },
   Email: { type: String },
+  Location: { type: String },
+  IncidentTime: { type: String },
   ReserveDetails: { type: Array }
 });
 
