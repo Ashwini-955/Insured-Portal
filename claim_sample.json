@@ -1,0 +1,24 @@
+{
+  "_id": "69c17dadb5e3c48e933122e7",
+  "ClaimNumber": "CFPD000201-00-02182026-01",
+  "PolicyNumber": "FPP2000002139-00",
+  "Status": "Open",
+  "LossDate": "2026-02-18T00:00:00",
+  "ReceivedDate": "2026-02-18T00:00:00",
+  "DescriptionOfLoss": "Mold damage found in property",
+  "AccidentCode": "Mold Damage",
+  "PaidLoss": 10,
+  "MainAdjusterName": "Sushil Singh",
+  "Phone": "(876) 888-6868",
+  "Email": "ssingh@cogitate.us",
+  "ReserveDetails": [
+    {
+      "LossRes": 12,
+      "LossesPaid": 10,
+      "AdjusterName": "Sushil Singh",
+      "AdjusterPhone": "(876) 888-6868",
+      "AdjusterEmail": "ssingh@cogitate.us"
+    }
+  ],
+  "__v": 0
+}

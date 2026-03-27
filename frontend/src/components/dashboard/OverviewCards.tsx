@@ -24,7 +24,7 @@ export function OverviewCards({
     [policies]
   );
   const open = useMemo(
-    () => (claims ?? []).filter((c) => !['Approved', 'Rejected', 'Closed'].includes(c.status ?? '')),
+    () => (claims ?? []).filter((c) => !['Approved', 'Rejected', 'Closed'].includes(c.Status ?? '')),
     [claims]
   );
   const totalDue = useMemo(
@@ -36,11 +36,11 @@ export function OverviewCards({
     [active]
   );
   const nextPayment = useMemo(
-    () => (billing ?? []).flatMap((b) => b.projectedStatements ?? []).map((s) => s.dueDate).filter(Boolean).sort()[0],
+    () => (billing ?? []).flatMap((b) => b.projectedStatements ?? []).map((s) => s.statementDueDate).filter(Boolean).sort()[0],
     [billing]
   );
   const lastClaim = useMemo(
-    () => (claims ?? []).map((c) => c.filedDate).filter(Boolean).sort().reverse()[0],
+    () => (claims ?? []).map((c) => c.ReceivedDate).filter(Boolean).sort().reverse()[0],
     [claims]
   );
 

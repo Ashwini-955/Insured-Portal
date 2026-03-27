@@ -1,0 +1,60 @@
+{
+  "_id": "69c17dadb5e3c48e933122ed",
+  "PolicyNumber": "FPP1900008896-00",
+  "payPlanDesc": "Monthly - NB",
+  "isRecurringPayment": true,
+  "accountTotalBalance": 12765.79,
+  "currentDueDate": null,
+  "currentAmountDue": 0,
+  "projectedStatements": [
+    {
+      "status": "Paid",
+      "policy": "FPP1900008896-00",
+      "statementDate": "2025-10-31T00:00:00",
+      "statementDueDate": "2025-10-31T00:00:00",
+      "statementTotalAmountDue": 4178.64,
+      "statementDurationPaid": 4178.64
+    },
+    {
+      "status": "Paid",
+      "policy": "FPP1900008896-00",
+      "statementDate": "2025-12-12T00:00:00",
+      "statementDueDate": "2025-12-15T00:00:00",
+      "statementTotalAmountDue": 1361.55,
+      "statementDurationPaid": 1361.55
+    },
+    {
+      "status": "Paid",
+      "policy": "FPP1900008896-00",
+      "statementDate": "2026-01-12T00:00:00",
+      "statementDueDate": "2026-01-15T00:00:00",
+      "statementTotalAmountDue": 1361.55,
+      "statementDurationPaid": 1361.55
+    },
+    {
+      "status": "Future",
+      "policy": "FPP1900008896-00",
+      "statementDate": "2026-02-12T00:00:00",
+      "statementDueDate": "2026-02-15T00:00:00",
+      "statementTotalAmountDue": 1894.58,
+      "statementDurationPaid": 0
+    },
+    {
+      "status": "Future",
+      "policy": "FPP1900008896-00",
+      "statementDate": "2026-03-12T00:00:00",
+      "statementDueDate": "2026-03-15T00:00:00",
+      "statementTotalAmountDue": 1564.44,
+      "statementDurationPaid": 0
+    },
+    {
+      "status": "Future",
+      "policy": "FPP1900008896-00",
+      "statementDate": "2026-04-12T00:00:00",
+      "statementDueDate": "2026-04-15T00:00:00",
+      "statementTotalAmountDue": 1564.44,
+      "statementDurationPaid": 0
+    }
+  ],
+  "__v": 0
+}

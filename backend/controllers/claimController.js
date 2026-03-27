@@ -1,4 +1,6 @@
 const Claim = require('../models/Claim');
+const fs = require('fs');
+const path = require('path');
 
 // GET /api/claims?policyNumbers=FPP1,FPP2,FPP3
 const getClaimsByPolicyNumbers = async (req, res) => {
@@ -10,7 +12,7 @@ const getClaimsByPolicyNumbers = async (req, res) => {
       return res.status(200).json({ success: true, count: 0, data: [] });
     }
 
-    const claims = await Claim.find({ policyNumber: { $in: policyNumbers } })
+    const claims = await Claim.find({ PolicyNumber: { $in: policyNumbers } })
       .select('-__v')
       .lean();
 
@@ -26,5 +28,59 @@ const getClaimsByPolicyNumbers = async (req, res) => {
     });
   }
 };
+// POST /api/claims
+const createClaim = async (req, res) => {
+  try {
+    const { policyNumber, incidentDate, incidentTime, location, description } = req.body;
 
-module.exports = { getClaimsByPolicyNumbers };
+    if (!policyNumber || !incidentDate || !description) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    // Generate claim number to match previous format (e.g., CFPD000888-00-03222026-01)
+    const randomSuffix = String(Math.floor(100000 + Math.random() * 900000)).padStart(6, '0');
+    const [year, month, day] = incidentDate.split('-');
+    const dateStr = `${month}${day}${year}`;
+    const newClaimNumber = `CFPD${randomSuffix}-00-${dateStr}-01`;
+
+    const newClaim = new Claim({
+      ClaimNumber: newClaimNumber,
+      PolicyNumber: policyNumber,
+      Status: 'Pending Review',
+      LossDate: incidentDate,
+      ReceivedDate: new Date().toISOString().split('T')[0],
+      DescriptionOfLoss: description,
+      Location: location,
+      IncidentTime: incidentTime,
+      PaidLoss: 0,
+      ReserveDetails: []
+    });
+
+    await newClaim.save();
+
+    // Sync to claims.json
+    try {
+      const claimsFilePath = path.join(__dirname, '../data/claims.json');
+      if (fs.existsSync(claimsFilePath)) {
+        const claimsData = JSON.parse(fs.readFileSync(claimsFilePath, 'utf8'));
+        claimsData.push(newClaim.toObject());
+        fs.writeFileSync(claimsFilePath, JSON.stringify(claimsData, null, 2), 'utf8');
+      }
+    } catch (fsErr) {
+      console.error('Error syncing to claims.json:', fsErr);
+      // We still return 201 since DB save succeeded
+    }
+
+    res.status(201).json({
+      success: true,
+      data: newClaim
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+module.exports = { getClaimsByPolicyNumbers, createClaim };

@@ -68,3 +68,25 @@ export async function getBillingByPolicyNumbers(policyNumbers: string[], signal?
   );
   return out.data ?? [];
 }
+
+export async function createClaim(data: {
+  policyNumber: string;
+  incidentDate: string;
+  incidentTime: string;
+  location: string;
+  description: string;
+}): Promise<Claim> {
+  let res: Response;
+  try {
+    res = await fetch(`${config.api.baseUrl}/claims`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, incidentDate: data.incidentDate }),
+    });
+  } catch {
+    throw new Error('Cannot reach server.');
+  }
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || 'Failed to create claim');
+  return result.data;
+}
