@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getClaimsByPolicyNumbers } = require('../controllers/claimController');
+const { getClaimsByPolicyNumbers, createClaim } = require('../controllers/claimController');
 
 router.get('/', getClaimsByPolicyNumbers);
+router.post('/', createClaim);
 
 module.exports = router;

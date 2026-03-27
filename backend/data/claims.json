@@ -42,5 +42,141 @@
         "AdjusterEmail": "ajohnson@cogitate.us"
       }
     ]
+  },
+  {
+    "ClaimNumber": "CFPD000999-00-01102026-01",
+    "PolicyNumber": "FPP1900008896-00",
+    "Status": "Approved",
+    "LossDate": "2026-01-10T00:00:00",
+    "ReceivedDate": "2026-01-12T00:00:00",
+    "DescriptionOfLoss": "Water pipe burst in the kitchen",
+    "AccidentCode": "Water Damage",
+    "PaidLoss": 3500,
+    "MainAdjusterName": "Alice Johnson",
+    "Phone": "(555) 123-4567",
+    "Email": "ajohnson@cogitate.us",
+    "ReserveDetails": [
+      {
+        "LossRes": 3500,
+        "LossesPaid": 3500,
+        "AdjusterName": "Alice Johnson",
+        "AdjusterPhone": "(555) 123-4567",
+        "AdjusterEmail": "ajohnson@cogitate.us"
+      }
+    ]
+  },
+  {
+    "ClaimNumber": "CFPD001002-00-12152025-01",
+    "PolicyNumber": "FPP2000002139-00",
+    "Status": "Rejected",
+    "LossDate": "2025-12-15T00:00:00",
+    "ReceivedDate": "2025-12-20T00:00:00",
+    "DescriptionOfLoss": "Lost farm equipment due to negligence",
+    "AccidentCode": "Lost/Stolen",
+    "PaidLoss": 0,
+    "MainAdjusterName": "Sushil Singh",
+    "Phone": "(876) 888-6868",
+    "Email": "ssingh@cogitate.us",
+    "ReserveDetails": [
+      {
+        "LossRes": 0,
+        "LossesPaid": 0,
+        "AdjusterName": "Sushil Singh",
+        "AdjusterPhone": "(876) 888-6868",
+        "AdjusterEmail": "ssingh@cogitate.us"
+      }
+    ]
+  },
+  {
+    "ClaimNumber": "CFPD001150-00-03202026-01",
+    "PolicyNumber": "FPP2025001234-00",
+    "Status": "Active",
+    "LossDate": "2026-03-20T00:00:00",
+    "ReceivedDate": "2026-03-21T00:00:00",
+    "DescriptionOfLoss": "Slip and fall in commercial property",
+    "AccidentCode": "Liability",
+    "PaidLoss": 0,
+    "MainAdjusterName": "Sarah Jenkins",
+    "Phone": "555-999-1111",
+    "Email": "sjenkins@cogitate.us",
+    "ReserveDetails": [
+      {
+        "LossRes": 10000,
+        "LossesPaid": 0,
+        "AdjusterName": "Sarah Jenkins",
+        "AdjusterPhone": "555-999-1111",
+        "AdjusterEmail": "sjenkins@cogitate.us"
+      }
+    ]
+  },
+  {
+    "ClaimNumber": "CFPD149601-00-03112026-01",
+    "PolicyNumber": "FPP2025001234-00",
+    "Status": "Pending Review",
+    "LossDate": "2026-03-11",
+    "ReceivedDate": "2026-03-27",
+    "DescriptionOfLoss": "Loss Due to Fire at WorkPlace",
+    "PaidLoss": 0,
+    "Location": "Mumbai",
+    "IncidentTime": "20:34",
+    "ReserveDetails": [],
+    "_id": "69c67297b652ddb56b4c8727",
+    "__v": 0
+  },
+  {
+    "ClaimNumber": "CFPD635092-00-03042026-01",
+    "PolicyNumber": "FPP2000002139-00",
+    "Status": "Pending Review",
+    "LossDate": "2026-03-04",
+    "ReceivedDate": "2026-03-27",
+    "DescriptionOfLoss": "Loss Due to Flood",
+    "PaidLoss": 0,
+    "Location": "Delhi",
+    "IncidentTime": "18:48",
+    "ReserveDetails": [],
+    "_id": "69c67551618da434c2011efd",
+    "__v": 0
+  },
+  {
+    "ClaimNumber": "CFPD480126-00-03242026-01",
+    "PolicyNumber": "FPP2025001234-00",
+    "Status": "Pending Review",
+    "LossDate": "2026-03-24",
+    "ReceivedDate": "2026-03-27",
+    "DescriptionOfLoss": "Commercial Loss",
+    "PaidLoss": 0,
+    "Location": "Pune ",
+    "IncidentTime": "21:51",
+    "ReserveDetails": [],
+    "_id": "69c6765e98f781ffb35cc212",
+    "__v": 0
+  },
+  {
+    "ClaimNumber": "CFPD464291-00-03232026-01",
+    "PolicyNumber": "FPP1900008896-00",
+    "Status": "Pending Review",
+    "LossDate": "2026-03-23",
+    "ReceivedDate": "2026-03-27",
+    "DescriptionOfLoss": "Loss due to Fire ",
+    "PaidLoss": 0,
+    "Location": "Delhi",
+    "IncidentTime": "22:05",
+    "ReserveDetails": [],
+    "_id": "69c6788c891ac45e437b46fc",
+    "__v": 0
+  },
+  {
+    "ClaimNumber": "CFPD644621-00-03112026-01",
+    "PolicyNumber": "FPP2025001234-00",
+    "Status": "Pending Review",
+    "LossDate": "2026-03-11",
+    "ReceivedDate": "2026-03-27",
+    "DescriptionOfLoss": "Loss Due to Fire.",
+    "PaidLoss": 0,
+    "Location": "Pune ",
+    "IncidentTime": "21:20",
+    "ReserveDetails": [],
+    "_id": "69c68ad000f3d320890b0248",
+    "__v": 0
   }
 ]

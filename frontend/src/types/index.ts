@@ -6,14 +6,25 @@ export interface User {
 
 export interface Policy {
   _id?: string;
-  PolicyNumber: string;
-  PolicyStatus?: string;
-  EffectiveDate?: string;
-  ExpirationDate?: string;
-  AccountId?: string;
-  ClientInformation?: {
-    Communications?: Array<{ Type: string; Value: string }>;
+  policyNumber: string;
+  policyType?: string;
+  status?: string;
+  effectiveDate?: string;
+  expirationDate?: string;
+  accountId?: string;
+  insured?: {
+    email?: string;
   };
+  propertyAddress?: {
+    addressLine1?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+  };
+  coverages?: Array<{
+    name?: string;
+    limit?: number;
+  }>;
 }
 
 export interface Claim {
@@ -22,6 +33,10 @@ export interface Claim {
   PolicyNumber: string;
   Status?: string;
   ReceivedDate?: string;
+  LossDate?: string;
+  DescriptionOfLoss?: string;
+  Location?: string;
+  IncidentTime?: string;
   PaidLoss?: number;
   AccidentCode?: string;
 }

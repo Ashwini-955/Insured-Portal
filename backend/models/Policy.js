@@ -1,18 +1,28 @@
 const mongoose = require('mongoose');
 
 const policySchema = new mongoose.Schema({
-  PolicyNumber: { type: String, required: true },
-  AccountId: { type: String, required: true },
-  PolicyStatus: { type: String },
-  EffectiveDate: { type: String },
-  ExpirationDate: { type: String },
-  Transaction: { type: Object },
-  TransactionHistory: { type: Array },
-  ClientInformation: { type: Object },
-  Agent: { type: Object },
-  Carrier: { type: Object },
-  PolicyCoverages: { type: Object },
-  Forms: { type: Array }
-});
+  policyNumber: { type: String, required: true },
+  accountId: { type: String, required: true },
+  policyType: { type: String },
+  status: { type: String },
+  effectiveDate: { type: String },
+  expirationDate: { type: String },
+  annualPremium: { type: Number },
+  insured: {
+    email: { type: String }
+  },
+  propertyAddress: {
+    addressLine1: { type: String },
+    city: { type: String },
+    state: { type: String },
+    zipCode: { type: String }
+  },
+  coverages: [{
+    name: { type: String },
+    limit: { type: Number }
+  }],
+  documents: { type: Array },
+  transactionHistory: { type: Array }
+}, { timestamps: true });
 
 module.exports = mongoose.model('Policy', policySchema);

@@ -10,8 +10,8 @@ const getPoliciesByEmail = async (req, res) => {
 
     const escapedEmail = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const policies = await Policy.find({
-      'ClientInformation.Communications.Value': { $regex: new RegExp(`^${escapedEmail}$`, 'i') }
-    }).select('PolicyNumber PolicyStatus EffectiveDate ExpirationDate AccountId ClientInformation Carrier');
+      'insured.email': { $regex: new RegExp(`^${escapedEmail}$`, 'i') }
+    }).select('policyNumber status effectiveDate expirationDate accountId insured policyType');
 
     if (!policies || policies.length === 0) {
       return res.status(404).json({
