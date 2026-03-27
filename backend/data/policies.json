@@ -1,82 +1,249 @@
 [
   {
-    "policyNumber": "FPP2000002139-00",
-    "accountId": "ACC-001",
-    "policyType": "Farm",
-    "status": "Policy Cancelled",
-    "effectiveDate": "2025-11-11",
-    "expirationDate": "2026-11-11",
-    "coveragePlan": "Select",
-    "annualPremium": 10749.5,
-    "cancellationReason": "Non Payment",
-    "carrier": "Sierra Specialty Insurance Company",
-    "insured": {
-      "firstName": "Narotam",
-      "lastName": "Singh",
-      "email": "nsingh@cogitate.us",
-      "phone": "8888888888"
+    "PolicyNumber": "FPP2000002139-00",
+    "AccountId": "ACC-001",
+    "PolicyStatus": "Policy Cancelled",
+    "EffectiveDate": "2025-11-11",
+    "ExpirationDate": "2026-11-11",
+    "Transaction": {
+      "Type": "Cancellation",
+      "Date": "2026-02-18",
+      "Reason": "Non Payment"
     },
-    "propertyAddress": {
-      "addressLine1": "2343 Avenue A Southeast",
-      "city": "Cullman",
-      "state": "AL",
-      "zip": "35055"
-    },
-    "agent": {
-      "name": "Pratham Shinde",
-      "email": "pshinde@cogitate.us",
-      "phone": "456-456-45454"
-    },
-    "coverages": [
-      { "description": "Farm Employer's Liability", "limit": 50000, "deductible": 0 },
-      { "description": "Farm Services for Hire Limited Liability", "limit": 50000, "deductible": 0 }
+    "TransactionHistory": [
+      {
+        "Type": "Renewal",
+        "Date": "2026-02-13",
+        "AnnualPremium": 10749.5
+      },
+      {
+        "Type": "Cancellation",
+        "Date": "2026-02-18",
+        "AnnualPremium": 10749.5
+      }
     ],
-    "documents": [
-      { "name": "Cancellation Summary", "type": "DynamicDocx" }
-    ],
-    "transactionHistory": [
-      { "type": "Renewal", "date": "2026-02-13", "annualPremium": 10749.5 },
-      { "type": "Cancellation", "date": "2026-02-18", "annualPremium": 10749.5 }
+    "ClientInformation": {
+      "FirstName": "Narotam",
+      "LastName": "Singh",
+      "Communications": [
+        {
+          "Type": "PhNo",
+          "Value": "8888888888"
+        },
+        {
+          "Type": "Email",
+          "Value": "nsingh@cogitate.us"
+        }
+      ],
+      "BusinessInfo": {
+        "Locations": [
+          {
+            "Address": {
+              "AddressLine1": "2343 Avenue A Southeast",
+              "City": "Cullman",
+              "State": "AL",
+              "Zip": "35055"
+            }
+          }
+        ]
+      }
+    },
+    "Agent": {
+      "Name": "Pratham Shinde",
+      "Communications": [
+        {
+          "Type": "PhNo",
+          "Value": "456-456-45454"
+        },
+        {
+          "Type": "Email",
+          "Value": "pshinde@cogitate.us"
+        }
+      ]
+    },
+    "Carrier": {
+      "Name": "Sierra Specialty Insurance Company"
+    },
+    "PolicyCoverages": {
+      "Coverages": [
+        {
+          "Description": "Farm Employer's Liability",
+          "Limit": 50000,
+          "Deductible": 0,
+          "IsSelected": true
+        },
+        {
+          "Description": "Farm Services for Hire Limited Liability",
+          "Limit": 50000,
+          "Deductible": 0,
+          "IsSelected": true
+        }
+      ]
+    },
+    "Forms": [
+      {
+        "FormName": "Cancellation Summary",
+        "FormType": "DynamicDocx"
+      }
     ]
   },
-
   {
-    "policyNumber": "FPP1900008896-00",
-    "accountId": "ACC-001",
-    "policyType": "House",
-    "status": "Active",
-    "effectiveDate": "2024-10-01",
-    "expirationDate": "2025-10-01",
-    "coveragePlan": "Premium",
-    "annualPremium": 8650.75,
-    "carrier": "Great Plains Mutual Insurance",
-    "insured": {
-      "firstName": "Narotam",
-      "lastName": "Singh",
-      "email": "nsingh@cogitate.us",
-      "phone": "8888888888"
+    "PolicyNumber": "FPP1900008896-00",
+    "AccountId": "ACC-001",
+    "PolicyStatus": "Active",
+    "EffectiveDate": "2024-10-01",
+    "ExpirationDate": "2025-10-01",
+    "Transaction": {
+      "Type": "New Business",
+      "Date": "2024-10-01",
+      "Reason": ""
     },
-    "propertyAddress": {
-      "addressLine1": "1189 County Road 12",
-      "city": "Decatur",
-      "state": "AL",
-      "zip": "35601"
-    },
-    "agent": {
-      "name": "Rohit Kulkarni",
-      "email": "rkulkarni@cogitate.us",
-      "phone": "777-222-1111"
-    },
-    "coverages": [
-      { "description": "House Property Coverage", "limit": 100000, "deductible": 1000 },
-      { "description": "Livestock Coverage", "limit": 25000, "deductible": 500 }
+    "TransactionHistory": [
+      {
+        "Type": "New Business",
+        "Date": "2024-10-01",
+        "AnnualPremium": 8650.75
+      }
     ],
-    "documents": [
-      { "name": "Policy Declarations", "type": "DynamicDocx" },
-      { "name": "Coverage Schedule", "type": "PDF" }
-    ],
-    "transactionHistory": [
-      { "type": "New Business", "date": "2024-10-01", "annualPremium": 8650.75 }
+    "ClientInformation": {
+      "FirstName": "Narotam",
+      "LastName": "Singh",
+      "Communications": [
+        {
+          "Type": "PhNo",
+          "Value": "8888888888"
+        },
+        {
+          "Type": "Email",
+          "Value": "nsingh@cogitate.us"
+        }
+      ],
+      "BusinessInfo": {
+        "Locations": [
+          {
+            "Address": {
+              "AddressLine1": "1189 County Road 12",
+              "City": "Decatur",
+              "State": "AL",
+              "Zip": "35601"
+            }
+          }
+        ]
+      }
+    },
+    "Agent": {
+      "Name": "Rohit Kulkarni",
+      "Communications": [
+        {
+          "Type": "PhNo",
+          "Value": "777-222-1111"
+        },
+        {
+          "Type": "Email",
+          "Value": "rkulkarni@cogitate.us"
+        }
+      ]
+    },
+    "Carrier": {
+      "Name": "Great Plains Mutual Insurance"
+    },
+    "PolicyCoverages": {
+      "Coverages": [
+        {
+          "Description": "House Property Coverage",
+          "Limit": 100000,
+          "Deductible": 1000,
+          "IsSelected": true
+        },
+        {
+          "Description": "Livestock Coverage",
+          "Limit": 25000,
+          "Deductible": 500,
+          "IsSelected": true
+        }
+      ]
+    },
+    "Forms": [
+      {
+        "FormName": "Policy Declarations",
+        "FormType": "DynamicDocx"
+      },
+      {
+        "FormName": "Coverage Schedule",
+        "FormType": "PDF"
+      }
     ]
+  },
+  {
+    "PolicyNumber": "FPP2025001234-00",
+    "AccountId": "ACC-001",
+    "PolicyStatus": "Pending",
+    "EffectiveDate": "2026-05-01",
+    "ExpirationDate": "2027-05-01",
+    "Transaction": {
+      "Type": "New Business",
+      "Date": "2026-03-23",
+      "Reason": ""
+    },
+    "TransactionHistory": [
+      {
+        "Type": "New Business",
+        "Date": "2026-03-23",
+        "AnnualPremium": 12500.00
+      }
+    ],
+    "ClientInformation": {
+      "FirstName": "Narotam",
+      "LastName": "Singh",
+      "Communications": [
+        {
+          "Type": "PhNo",
+          "Value": "8888888888"
+        },
+        {
+          "Type": "Email",
+          "Value": "nsingh@cogitate.us"
+        }
+      ],
+      "BusinessInfo": {
+        "Locations": [
+          {
+            "Address": {
+              "AddressLine1": "99 Commercial Blvd",
+              "City": "Atlanta",
+              "State": "GA",
+              "Zip": "30303"
+            }
+          }
+        ]
+      }
+    },
+    "Agent": {
+      "Name": "Sarah Jenkins",
+      "Communications": [
+        {
+          "Type": "PhNo",
+          "Value": "555-999-1111"
+        },
+        {
+          "Type": "Email",
+          "Value": "sjenkins@cogitate.us"
+        }
+      ]
+    },
+    "Carrier": {
+      "Name": "Commercial Standard Insurance"
+    },
+    "PolicyCoverages": {
+      "Coverages": [
+        {
+          "Description": "Commercial General Liability",
+          "Limit": 2000000,
+          "Deductible": 5000,
+          "IsSelected": true
+        }
+      ]
+    },
+    "Forms": []
   }
 ]

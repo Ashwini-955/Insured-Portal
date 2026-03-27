@@ -11,27 +11,42 @@ export interface Policy {
   status?: string;
   effectiveDate?: string;
   expirationDate?: string;
-  insured?: { email?: string };
-  propertyAddress?: { addressLine1?: string; city?: string };
+  accountId?: string;
+  insured?: {
+    email?: string;
+  };
+  propertyAddress?: {
+    addressLine1?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+  };
+  coverages?: Array<{
+    name?: string;
+    limit?: number;
+  }>;
 }
 
 export interface Claim {
   _id?: string;
-  claimNumber: string;
-  policyNumber: string;
-  title?: string;
-  status?: string;
-  filedDate?: string;
-  amountClaimed?: number;
+  ClaimNumber: string;
+  PolicyNumber: string;
+  Status?: string;
+  ReceivedDate?: string;
+  LossDate?: string;
+  DescriptionOfLoss?: string;
+  Location?: string;
+  IncidentTime?: string;
+  PaidLoss?: number;
+  AccidentCode?: string;
 }
 
 export interface Billing {
   _id?: string;
-  billingId?: string;
-  policyNumber: string;
+  PolicyNumber: string;
   currentAmountDue?: number;
   currentDueDate?: string;
-  projectedStatements?: Array<{ status: string; dueDate: string; totalAmountDue?: number }>;
+  projectedStatements?: Array<{ status: string; statementDueDate: string; statementTotalAmountDue?: number }>;
 }
 
 export interface LoginResponse {
