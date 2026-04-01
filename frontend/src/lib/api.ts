@@ -69,15 +69,6 @@ export async function getBillingByPolicyNumbers(policyNumbers: string[], signal?
   return out.data ?? [];
 }
 
-export async function getInvoicesByPolicy(policyNumber: string, signal?: AbortSignal): Promise<Invoice[]> {
-  if (!policyNumber) return [];
-  const out = await getJson<ApiListResponse<Invoice[]>>(
-    `${config.api.baseUrl}/billing/invoices?policyNumber=${encodeURIComponent(policyNumber)}`,
-    signal
-  );
-  return out.data ?? [];
-}
-
 export async function createClaim(data: {
   policyNumber: string;
   incidentDate: string;
