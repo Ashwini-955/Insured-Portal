@@ -12,9 +12,8 @@ const getClaimsByPolicyNumbers = async (req, res) => {
       return res.status(200).json({ success: true, count: 0, data: [] });
     }
 
-    const claims = await Claim.find({ PolicyNumber: { $in: policyNumbers } })
-      .select('-__v')
-      .lean();
+    const claimsData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/claims.json'), 'utf8'));
+    const claims = claimsData.filter(c => policyNumbers.includes(c.PolicyNumber));
 
     res.status(200).json({
       success: true,

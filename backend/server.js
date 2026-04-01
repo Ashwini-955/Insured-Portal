@@ -6,7 +6,7 @@ const connectDB = require('./config/db');
 
 // Load env from backend/.env (repo root may not contain .env)
 dotenv.config({ path: path.join(__dirname, '.env') });
-connectDB();
+// connectDB(); // Bypassed for local JSON testing without MongoDB
 const app = express();
 
 app.use(cors());
