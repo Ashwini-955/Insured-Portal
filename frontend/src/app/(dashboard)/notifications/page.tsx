@@ -8,13 +8,25 @@ interface LastEmail {
   timestamp: string;
 }
 
+interface LastClaim {
+  policyNumber: string;
+  claimNumber: string;
+  timestamp: string;
+}
+
 export default function NotificationsPage() {
   const [lastEmail, setLastEmail] = useState<LastEmail | null>(null);
+  const [lastClaim, setLastClaim] = useState<LastClaim | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem('lastPaymentEmail');
     if (stored) {
       setLastEmail(JSON.parse(stored));
+    }
+    
+    const storedClaim = localStorage.getItem('lastClaimFiled');
+    if (storedClaim) {
+      setLastClaim(JSON.parse(storedClaim));
     }
   }, []);
 
@@ -27,15 +39,28 @@ export default function NotificationsPage() {
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Notifications</h2>
-        {lastEmail ? (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-blue-800 font-medium">
-              Payment email sent for Policy {lastEmail.policyNumber} on {formatDate(lastEmail.timestamp)}.
-            </p>
-          </div>
-        ) : (
-          <p className="text-gray-500">No notifications yet.</p>
-        )}
+        
+        <div className="space-y-4">
+          {lastClaim && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p className="text-green-800 font-medium">
+                New claim filed with Claim #{lastClaim.claimNumber} for Policy {lastClaim.policyNumber} on {formatDate(lastClaim.timestamp)}.
+              </p>
+            </div>
+          )}
+
+          {lastEmail && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-blue-800 font-medium">
+                Payment email sent for Policy {lastEmail.policyNumber} on {formatDate(lastEmail.timestamp)}.
+              </p>
+            </div>
+          )}
+
+          {!lastEmail && !lastClaim && (
+            <p className="text-gray-500">No notifications yet.</p>
+          )}
+        </div>
       </div>
     </div>
   );
