@@ -117,7 +117,15 @@ export default function NewClaimWizard() {
       // Append each selected image to the form data
       images.forEach(img => fd.append('images', img));
       
-      await createClaimWithImages(fd);
+      const newClaim = await createClaimWithImages(fd);
+      
+      // Store info for the notification page
+      localStorage.setItem('lastClaimFiled', JSON.stringify({
+        policyNumber: formData.policyNumber,
+        claimNumber: newClaim.ClaimNumber,
+        timestamp: new Date().toISOString()
+      }));
+
       setIsSuccess(true);
     } catch (err) {
       if (err instanceof Error) {
