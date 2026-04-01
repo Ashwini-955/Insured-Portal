@@ -29,4 +29,33 @@ const getBillingByPolicyNumbers = async (req, res) => {
   }
 };
 
-module.exports = { getBillingByPolicyNumbers };
+// GET /api/billing/invoices?policyNumber=FPP1
+const getInvoicesByPolicyNumber = async (req, res) => {
+  try {
+    const policyNumber = req.query.policyNumber?.trim();
+
+    if (!policyNumber) {
+      return res.status(400).json({ success: false, message: 'Policy number is required' });
+    }
+
+    const billingData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/billing.json'), 'utf8'));
+    const billing = billingData.find(b => b.PolicyNumber === policyNumber);
+
+    if (!billing) {
+      return res.status(200).json({ success: true, count: 0, data: [] });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: billing.projectedStatements?.length || 0,
+      data: billing.projectedStatements || []
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+module.exports = { getBillingByPolicyNumbers, getInvoicesByPolicyNumber };

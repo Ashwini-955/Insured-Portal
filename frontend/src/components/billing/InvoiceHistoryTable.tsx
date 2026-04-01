@@ -2,10 +2,10 @@ import React from 'react';
 import { Download, FileText, ExternalLink } from 'lucide-react';
 import { formatDate } from '@/utils/formatDate';
 import { formatCurrency } from '@/utils/formatCurrency';
-import type { Billing } from '@/types';
+import type { Invoice } from '@/types';
 
-export default function InvoiceHistoryTable({ billing }: { billing: Billing | null }) {
-  if (!billing || !billing.projectedStatements || billing.projectedStatements.length === 0) {
+export default function InvoiceHistoryTable({ invoices }: { invoices: Invoice[] }) {
+  if (!invoices || invoices.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center mt-8">
         <p className="text-gray-500 font-medium">No invoice history found for this policy.</p>
@@ -49,7 +49,7 @@ export default function InvoiceHistoryTable({ billing }: { billing: Billing | nu
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {billing.projectedStatements.map((invoice, idx) => {
+            {invoices.map((invoice, idx) => {
               // Creating a mock invoice ID for display since not immediately present in projectedStatements map
               const invoiceId = `INV-${new Date(invoice.statementDate || invoice.statementDueDate).getFullYear()}-${String(idx + 1).padStart(3, '0')}`;
               
