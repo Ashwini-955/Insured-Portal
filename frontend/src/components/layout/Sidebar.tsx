@@ -8,7 +8,6 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
 
