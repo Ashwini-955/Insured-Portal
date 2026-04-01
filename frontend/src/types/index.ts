@@ -49,7 +49,14 @@ export interface Billing {
   accountTotalBalance?: number;
   currentAmountDue?: number;
   currentDueDate?: string;
-  projectedStatements?: Invoice[];
+  projectedStatements?: Array<{ 
+    status: string; 
+    policy?: string;
+    statementDate?: string;
+    statementDueDate: string; 
+    statementTotalAmountDue?: number;
+    statementDurationPaid?: number;
+  }>;
 }
 
 export interface Invoice {

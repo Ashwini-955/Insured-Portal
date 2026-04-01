@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { getPoliciesByEmail, getBillingByPolicyNumbers, getInvoicesByPolicy } from '@/lib/api';
-import type { Policy, Billing, Invoice } from '@/types';
+import { getPoliciesByEmail, getBillingByPolicyNumbers } from '@/lib/api';
+import type { Policy, Billing } from '@/types';
 import { Loader2, AlertCircle } from 'lucide-react';
 
 import PolicySelector from '@/components/claims/PolicySelector';
@@ -16,7 +16,6 @@ export default function BillingPage() {
   const { user } = useAuth();
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [billings, setBillings] = useState<Billing[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -75,34 +74,6 @@ export default function BillingPage() {
     };
   }, [user?.email]);
 
-  useEffect(() => {
-    if (!selectedPolicyId) {
-      setInvoices([]);
-      return;
-    }
-
-    const controller = new AbortController();
-    const signal = controller.signal;
-    let cancelled = false;
-
-    const loadInvoices = async () => {
-      try {
-        const inv = await getInvoicesByPolicy(selectedPolicyId, signal);
-        if (!cancelled) setInvoices(inv);
-      } catch (e) {
-        if (e instanceof Error && e.name === 'AbortError') return;
-        if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load invoices');
-      }
-    };
-
-    void loadInvoices();
-
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [selectedPolicyId]);
-
   const selectedPolicy = useMemo(() => {
     return policies.find(p => p.policyNumber === selectedPolicyId) || null;
   }, [policies, selectedPolicyId]);
@@ -158,7 +129,7 @@ export default function BillingPage() {
             <AutoPayCard billing={selectedBilling} />
           </div>
 
-          <InvoiceHistoryTable invoices={invoices} />
+          <InvoiceHistoryTable billing={selectedBilling} />
         </div>
       ) : (
         <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-8 text-center mt-8">
