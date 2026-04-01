@@ -1,5 +1,5 @@
 import { config } from '@/config/env';
-import type { LoginResponse, Policy, Claim, Billing } from '@/types';
+import type { LoginResponse, Policy, Claim, Billing, Invoice } from '@/types';
 
 export async function loginWithEmail(email: string): Promise<LoginResponse> {
   let res: Response;
@@ -64,6 +64,15 @@ export async function getBillingByPolicyNumbers(policyNumbers: string[], signal?
   const q = policyNumbers.map((p) => encodeURIComponent(p)).join(',');
   const out = await getJson<ApiListResponse<Billing[]>>(
     `${config.api.baseUrl}/billing?policyNumbers=${q}`,
+    signal
+  );
+  return out.data ?? [];
+}
+
+export async function getInvoicesByPolicy(policyNumber: string, signal?: AbortSignal): Promise<Invoice[]> {
+  if (!policyNumber) return [];
+  const out = await getJson<ApiListResponse<Invoice[]>>(
+    `${config.api.baseUrl}/billing/invoices?policyNumber=${encodeURIComponent(policyNumber)}`,
     signal
   );
   return out.data ?? [];

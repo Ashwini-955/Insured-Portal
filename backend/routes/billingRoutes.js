@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getBillingByPolicyNumbers } = require('../controllers/billingController');
+const { getBillingByPolicyNumbers, getInvoicesByPolicyNumber } = require('../controllers/billingController');
 
 router.get('/', getBillingByPolicyNumbers);
+router.get('/invoices', getInvoicesByPolicyNumber);
 
 module.exports = router;
