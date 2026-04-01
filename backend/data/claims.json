@@ -178,5 +178,93 @@
     "ReserveDetails": [],
     "_id": "69c68ad000f3d320890b0248",
     "__v": 0
+  },
+  {
+    "ClaimNumber": "CFPD135292-00-04142026-01",
+    "PolicyNumber": "FPP1900008896-00",
+    "Status": "Pending Review",
+    "LossDate": "2026-04-14",
+    "ReceivedDate": "2026-04-01",
+    "DescriptionOfLoss": "Leakage due to flood",
+    "PaidLoss": 0,
+    "Location": "Delhi",
+    "IncidentTime": "16:39",
+    "ReserveDetails": [],
+    "Images": [
+      "https://res.cloudinary.com/dhj6flkhp/image/upload/v1775041513/insured_portal_claims/kcwefkhiey4j0qi0lqnm.png"
+    ],
+    "_id": "69ccfbebac95f714a6654521",
+    "__v": 0
+  },
+  {
+    "ClaimNumber": "CFPD797534-00-04142026-01",
+    "PolicyNumber": "FPP2000002139-00",
+    "Status": "Pending Review",
+    "LossDate": "2026-04-14",
+    "ReceivedDate": "2026-04-01",
+    "DescriptionOfLoss": "Fire",
+    "PaidLoss": 0,
+    "Location": "Pune ",
+    "IncidentTime": "18:46",
+    "ReserveDetails": [],
+    "Images": [
+      "https://res.cloudinary.com/dhj6flkhp/image/upload/v1775042188/insured_portal_claims/qirveer1vwvdx5bomwm4.png"
+    ],
+    "_id": "69ccfe8dac95f714a6654529",
+    "__v": 0
+  },
+  {
+    "ClaimNumber": "CFPD992580-00-04132026-01",
+    "PolicyNumber": "FPP2000002139-00",
+    "Status": "Pending Review",
+    "LossDate": "2026-04-13",
+    "ReceivedDate": "2026-04-01",
+    "DescriptionOfLoss": "Loss due to hail",
+    "PaidLoss": 0,
+    "Location": "Nashik",
+    "IncidentTime": "18:10",
+    "ReserveDetails": [],
+    "Images": [
+      "https://res.cloudinary.com/dhj6flkhp/image/upload/v1775046955/insured_portal_claims/xnpe4wpigqucxhb2jjid.webp",
+      "https://res.cloudinary.com/dhj6flkhp/image/upload/v1775046955/insured_portal_claims/gbi0uwwzskgegz9rrb75.webp"
+    ],
+    "_id": "69cd112c2ff6c67758d176c5",
+    "__v": 0
+  },
+  {
+    "ClaimNumber": "CFPD705857-00-04142026-01",
+    "PolicyNumber": "FPP1900008896-00",
+    "Status": "Pending Review",
+    "LossDate": "2026-04-14",
+    "ReceivedDate": "2026-04-01",
+    "DescriptionOfLoss": "Earthquake damage",
+    "PaidLoss": 0,
+    "Location": "Assam",
+    "IncidentTime": "18:14",
+    "ReserveDetails": [],
+    "Images": [
+      "https://res.cloudinary.com/dhj6flkhp/image/upload/v1775047290/insured_portal_claims/gu6xzcim4pblqpgkyrdq.webp",
+      "https://res.cloudinary.com/dhj6flkhp/image/upload/v1775047289/insured_portal_claims/vk1f1enruxm8sfhbrovn.webp"
+    ],
+    "_id": "69cd127b2ff6c67758d176cd",
+    "__v": 0
+  },
+  {
+    "ClaimNumber": "CFPD533994-00-04132026-01",
+    "PolicyNumber": "FPP1900008896-00",
+    "Status": "Pending Review",
+    "LossDate": "2026-04-13",
+    "ReceivedDate": "2026-04-01",
+    "DescriptionOfLoss": "Damaged caused due to flood",
+    "PaidLoss": 0,
+    "Location": "Delhi",
+    "IncidentTime": "23:05",
+    "ReserveDetails": [],
+    "Images": [
+      "https://res.cloudinary.com/dhj6flkhp/image/upload/v1775050589/insured_portal_claims/iaywlrfpjefaz37k2kl6.webp",
+      "https://res.cloudinary.com/dhj6flkhp/image/upload/v1775050589/insured_portal_claims/oavoomcs2myp94gkiqby.webp"
+    ],
+    "_id": "69cd1f5e528ebb39fb1f4ce3",
+    "__v": 0
   }
 ]
