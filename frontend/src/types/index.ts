@@ -44,9 +44,19 @@ export interface Claim {
 export interface Billing {
   _id?: string;
   PolicyNumber: string;
+  payPlanDesc?: string;
+  isRecurringPayment?: boolean;
+  accountTotalBalance?: number;
   currentAmountDue?: number;
   currentDueDate?: string;
-  projectedStatements?: Array<{ status: string; statementDueDate: string; statementTotalAmountDue?: number }>;
+  projectedStatements?: Array<{ 
+    status: string; 
+    policy?: string;
+    statementDate?: string;
+    statementDueDate: string; 
+    statementTotalAmountDue?: number;
+    statementDurationPaid?: number;
+  }>;
 }
 
 export interface LoginResponse {

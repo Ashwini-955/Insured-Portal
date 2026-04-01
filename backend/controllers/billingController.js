@@ -1,5 +1,8 @@
 const Billing = require('../models/Billing');
 
+const fs = require('fs');
+const path = require('path');
+
 // GET /api/billing?policyNumbers=FPP1,FPP2,FPP3
 const getBillingByPolicyNumbers = async (req, res) => {
   try {
@@ -10,9 +13,8 @@ const getBillingByPolicyNumbers = async (req, res) => {
       return res.status(200).json({ success: true, count: 0, data: [] });
     }
 
-    const billing = await Billing.find({ PolicyNumber: { $in: policyNumbers } })
-      .select('-__v')
-      .lean();
+    const billingData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/billing.json'), 'utf8'));
+    const billing = billingData.filter(b => policyNumbers.includes(b.PolicyNumber));
 
     res.status(200).json({
       success: true,
