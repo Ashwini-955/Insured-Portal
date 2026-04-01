@@ -1,5 +1,5 @@
 import { config } from '@/config/env';
-import type { LoginResponse, Policy, Claim, Billing } from '@/types';
+import type { LoginResponse, Policy, Claim, Billing, Invoice } from '@/types';
 
 export async function loginWithEmail(email: string): Promise<LoginResponse> {
   let res: Response;
@@ -67,6 +67,22 @@ export async function getBillingByPolicyNumbers(policyNumbers: string[], signal?
     signal
   );
   return out.data ?? [];
+}
+
+export async function sendPaymentEmail(data: { policyNumber: string; email: string; amount: number }): Promise<{ success: boolean; message: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${config.api.baseUrl}/billing/send-payment-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  } catch {
+    throw new Error('Cannot reach server.');
+  }
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || 'Failed to send email');
+  return result;
 }
 
 export async function createClaim(data: {
