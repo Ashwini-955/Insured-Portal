@@ -48,7 +48,46 @@ export default function PolicySelector({
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-bold text-gray-900">Select Your Policy</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Mobile: Horizontal scrolling cards */}
+      <div className="block md:hidden">
+        <div className="flex space-x-3 overflow-x-auto pb-4 scrollbar-hide">
+          {mappedPolicies.map((policy) => {
+            const isSelected = selectedPolicyId === policy.id;
+            
+            return (
+              <div 
+                key={policy.id} 
+                onClick={() => onSelectPolicy?.(isSelected ? null : policy.id)}
+                className={`bg-white rounded-xl border p-3 cursor-pointer transition-all hover:shadow-md flex-shrink-0 w-48 ${
+                  isSelected 
+                    ? 'border-blue-600 shadow-md ring-2 ring-blue-600 bg-blue-50/10' 
+                    : policy.active 
+                      ? 'border-blue-300 shadow-sm hover:border-blue-400' 
+                      : 'border-gray-200 shadow-sm hover:border-gray-300'
+                }`}
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex items-start space-x-2 mb-3">
+                    <div className={`p-1.5 rounded-full border shadow-sm ${isSelected ? 'border-blue-200 bg-blue-100' : 'border-gray-100 bg-gray-50'}`}>
+                      <policy.icon className={`w-4 h-4 ${isSelected ? 'text-blue-600' : 'text-gray-500'}`} />
+                    </div>
+                    <div className="mt-0.5">
+                      <h3 className="font-bold text-gray-900 text-xs line-clamp-1" title={policy.type}>{policy.type}</h3>
+                      <p className="text-xs text-gray-500 font-medium">{policy.id}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-1 pt-1 border-t border-gray-50/50">
+                  <span className="text-xs font-semibold text-gray-500">Status:</span>
+                  {getPolicyStatusBadge(policy.status)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {/* Desktop: Grid layout */}
+      <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6">
         {mappedPolicies.map((policy) => {
           const isSelected = selectedPolicyId === policy.id;
           
