@@ -69,6 +69,22 @@ export async function getBillingByPolicyNumbers(policyNumbers: string[], signal?
   return out.data ?? [];
 }
 
+export async function sendPaymentEmail(data: { policyNumber: string; email: string; amount: number }): Promise<{ success: boolean; message: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${config.api.baseUrl}/billing/send-payment-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  } catch {
+    throw new Error('Cannot reach server.');
+  }
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || 'Failed to send email');
+  return result;
+}
+
 export async function createClaim(data: {
   policyNumber: string;
   incidentDate: string;
