@@ -359,32 +359,6 @@ export default function NewClaimWizard() {
 
       </div>
 
-      {/* Footer Timeline Graphic */}
-      <div className="mt-8 flex items-center justify-center max-w-2xl mx-auto">
-        <div className="flex items-center space-x-2 text-blue-600 flex-1 justify-center">
-          <div className="flex flex-col items-center">
-             <FileText className="w-6 h-6 mb-2" />
-             <span className="text-xs font-bold uppercase tracking-wider">Submitted</span>
-          </div>
-          <div className="h-1 w-16 bg-blue-600 rounded-full mx-4 mb-5" />
-        </div>
-        
-        <div className="flex items-center space-x-2 text-gray-400 flex-1 justify-center">
-          <div className="flex flex-col items-center">
-             <Clock className="w-6 h-6 mb-2" />
-             <span className="text-xs font-bold uppercase tracking-wider">Under Review</span>
-          </div>
-          <div className="h-1 w-16 bg-gray-200 rounded-full mx-4 mb-5" />
-        </div>
-
-        <div className="flex items-center space-x-2 text-gray-400 flex-1 justify-center">
-          <div className="flex flex-col items-center">
-             <CheckCircle2 className="w-6 h-6 mb-2" />
-             <span className="text-xs font-bold uppercase tracking-wider">Approved/Denied</span>
-          </div>
-        </div>
-      </div>
-
     </div>
   );
 }

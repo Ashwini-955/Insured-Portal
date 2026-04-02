@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { formatDate } from '@/utils/formatDate';
 import { formatCurrency } from '@/utils/formatCurrency';
 import type { Claim } from '@/types';
+import { ClaimDetailsModal } from './ClaimDetailsModal';
 
 export default function ClaimsTable({ claims = [] }: { claims?: Claim[] }) {
+  const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
 
   const getStatusBadge = (status: string) => {
     const s = status.toLowerCase();
@@ -56,7 +58,10 @@ export default function ClaimsTable({ claims = [] }: { claims?: Claim[] }) {
                   {getStatusBadge(claim.Status || 'Unknown')}
                 </td>
                 <td className="px-4 md:px-6 py-3 md:py-4 text-right">
-                  <button className="text-xs md:text-sm font-bold text-gray-900 hover:text-blue-600 transition-colors">
+                  <button 
+                    onClick={() => setSelectedClaim(claim)}
+                    className="text-xs md:text-sm font-bold text-gray-900 hover:text-blue-600 transition-colors"
+                  >
                     View Details
                   </button>
                 </td>
@@ -72,6 +77,12 @@ export default function ClaimsTable({ claims = [] }: { claims?: Claim[] }) {
           </tbody>
         </table>
       </div>
+      {selectedClaim && (
+        <ClaimDetailsModal 
+          claim={selectedClaim} 
+          onClose={() => setSelectedClaim(null)} 
+        />
+      )}
     </div>
   );
 }
