@@ -202,7 +202,7 @@ export default function NewClaimWizard() {
                     name="policyNumber"
                     value={formData.policyNumber}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900"
                     disabled={isLoading}
                   >
                     <option value="" disabled>Select Policy...</option>
@@ -221,7 +221,7 @@ export default function NewClaimWizard() {
                     name="incidentDate"
                     value={formData.incidentDate}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900"
                   />
                 </div>
 
@@ -232,7 +232,7 @@ export default function NewClaimWizard() {
                     name="incidentTime"
                     value={formData.incidentTime}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900"
                   />
                 </div>
 
@@ -244,7 +244,7 @@ export default function NewClaimWizard() {
                     value={formData.location}
                     onChange={handleChange}
                     placeholder="e.g., Main Street, City"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900"
                   />
                 </div>
               </div>
@@ -257,7 +257,7 @@ export default function NewClaimWizard() {
                   onChange={handleChange}
                   placeholder="Provide a detailed description of the incident"
                   rows={4}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm resize-none"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900 resize-none"
                 />
               </div>
             </div>
