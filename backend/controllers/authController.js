@@ -13,8 +13,6 @@ const JWT_SECRET = process.env.JWT_SECRET || 'insured-portal-secret-key';
  * 2) GET /api/claims?policyNumbers=...
  * 3) GET /api/billing?policyNumbers=...
  */
-const fs = require('fs');
-const path = require('path');
 
 const login = async (req, res) => {
   try {
@@ -29,9 +27,7 @@ const login = async (req, res) => {
 
     const unescapedEmail = email.trim().toLowerCase();
 
-    // 1. Find user by email from JSON
-    const usersData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/users.json'), 'utf8'));
-    const user = usersData.find(u => u.email.toLowerCase() === unescapedEmail);
+    const user = await User.findOne({ email: new RegExp('^' + unescapedEmail + '$', 'i') });
     
     if (!user) {
       return res.status(404).json({

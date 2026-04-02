@@ -1,8 +1,6 @@
 const Billing = require('../models/Billing');
 const { sendPaymentEmail } = require('../utils/email');
 
-const fs = require('fs');
-const path = require('path');
 
 // GET /api/billing?policyNumbers=FPP1,FPP2,FPP3
 const getBillingByPolicyNumbers = async (req, res) => {
@@ -14,8 +12,8 @@ const getBillingByPolicyNumbers = async (req, res) => {
       return res.status(200).json({ success: true, count: 0, data: [] });
     }
 
-    const billingData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/billing.json'), 'utf8'));
-    const billing = billingData.filter(b => policyNumbers.includes(b.PolicyNumber));
+    const billing = await Billing.find({ PolicyNumber: { $in: policyNumbers } });
+
 
     res.status(200).json({
       success: true,
@@ -40,8 +38,8 @@ const sendPaymentEmailController = async (req, res) => {
     }
 
     // Check if policy exists
-    const billingData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/billing.json'), 'utf8'));
-    const billing = billingData.find(b => b.PolicyNumber === policyNumber);
+    const billing = await Billing.findOne({ PolicyNumber: policyNumber });
+
     if (!billing) {
       return res.status(404).json({ success: false, message: 'Policy not found' });
     }
