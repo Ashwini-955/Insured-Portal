@@ -1,7 +1,6 @@
 const Policy = require('../models/Policy');
+const User = require('../models/User');
 
-const fs = require('fs');
-const path = require('path');
 
 const getPoliciesByEmail = async (req, res) => {
   try {
@@ -10,20 +9,7 @@ const getPoliciesByEmail = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email is required' });
     }
 
-    const usersData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/users.json'), 'utf8'));
-    const user = usersData.find(u => u.email.toLowerCase() === email);
-
-    if (!user || (!user.policyNumbers && !user.policy_numbers)) {
-      return res.status(404).json({
-        success: false,
-        message: 'No policies found for this email'
-      });
-    }
-    
-    const targetNumbers = user.policyNumbers || user.policy_numbers || [];
-
-    const policiesData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/policies.json'), 'utf8'));
-    const matched = policiesData.filter(p => targetNumbers.includes(p.PolicyNumber || p.policyNumber));
+    const matched = await Policy.find({ 'insured.email': new RegExp('^' + email + '$', 'i') });
 
     const transformedPolicies = matched.map(p => ({
       policyNumber: p.PolicyNumber || p.policyNumber,
@@ -31,9 +17,9 @@ const getPoliciesByEmail = async (req, res) => {
       effectiveDate: p.EffectiveDate || p.effectiveDate,
       expirationDate: p.ExpirationDate || p.expirationDate,
       accountId: p.AccountId || p.accountId,
-      policyType: 'Insurance Policy',
+      policyType: p.policyType || 'Insurance Policy',
       insured: {
-        email: user.email
+        email: p.insured?.email || email
       }
     }));
 

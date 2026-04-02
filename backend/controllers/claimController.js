@@ -1,6 +1,4 @@
 const Claim = require('../models/Claim');
-const fs = require('fs');
-const path = require('path');
 
 // GET /api/claims?policyNumbers=FPP1,FPP2,FPP3
 const getClaimsByPolicyNumbers = async (req, res) => {
@@ -12,8 +10,8 @@ const getClaimsByPolicyNumbers = async (req, res) => {
       return res.status(200).json({ success: true, count: 0, data: [] });
     }
 
-    const claimsData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/claims.json'), 'utf8'));
-    const claims = claimsData.filter(c => policyNumbers.includes(c.PolicyNumber));
+    const claims = await Claim.find({ PolicyNumber: { $in: policyNumbers } });
+
 
     res.status(200).json({
       success: true,
@@ -61,19 +59,6 @@ const createClaim = async (req, res) => {
     });
 
     await newClaim.save();
-
-    // Sync to claims.json
-    try {
-      const claimsFilePath = path.join(__dirname, '../data/claims.json');
-      if (fs.existsSync(claimsFilePath)) {
-        const claimsData = JSON.parse(fs.readFileSync(claimsFilePath, 'utf8'));
-        claimsData.push(newClaim.toObject());
-        fs.writeFileSync(claimsFilePath, JSON.stringify(claimsData, null, 2), 'utf8');
-      }
-    } catch (fsErr) {
-      console.error('Error syncing to claims.json:', fsErr);
-      // We still return 201 since DB save succeeded
-    }
 
     res.status(201).json({
       success: true,
