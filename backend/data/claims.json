@@ -178,19 +178,5 @@
     "ReserveDetails": [],
     "_id": "69c68ad000f3d320890b0248",
     "__v": 0
-  },
-  {
-    "ClaimNumber": "CFPD124517-00-03042026-01",
-    "PolicyNumber": "FPP2000002139-00",
-    "Status": "Pending Review",
-    "LossDate": "2026-03-04",
-    "ReceivedDate": "2026-03-31",
-    "DescriptionOfLoss": "bucxebvc",
-    "PaidLoss": 0,
-    "Location": "pune",
-    "IncidentTime": "23:18",
-    "ReserveDetails": [],
-    "_id": "69cbfad8e0c83963fd9f06c0",
-    "__v": 0
   }
 ]

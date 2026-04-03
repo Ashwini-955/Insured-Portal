@@ -23,15 +23,15 @@ export default function RecentActivity({ claims = [] }: { claims?: Claim[] }) {
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="p-5 border-b border-gray-100">
-        <h2 className="text-lg font-bold text-gray-900">Recent Activity</h2>
+      <div className="p-4 md:p-5 border-b border-gray-100">
+        <h2 className="text-base md:text-lg font-bold text-gray-900">Recent Activity</h2>
       </div>
       <div className="divide-y divide-gray-100">
         {activities.map((activity) => (
-          <div key={activity.id} className="p-4 px-6 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 transition-colors cursor-default gap-2 sm:gap-0">
-            <div className="flex items-center space-x-4">
-              <activity.icon className={`w-5 h-5 ${activity.iconColor}`} strokeWidth={2} />
-              <p className="text-sm text-gray-700 font-medium">{activity.text}</p>
+          <div key={activity.id} className="p-3 md:p-4 px-4 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 transition-colors cursor-default gap-1 md:gap-2 sm:gap-0">
+            <div className="flex items-center space-x-3 md:space-x-4">
+              <activity.icon className={`w-4 h-4 md:w-5 md:h-5 ${activity.iconColor}`} strokeWidth={2} />
+              <p className="text-xs md:text-sm text-gray-700 font-medium">{activity.text}</p>
             </div>
             <span className="text-xs text-gray-500 font-medium">{activity.date}</span>
           </div>

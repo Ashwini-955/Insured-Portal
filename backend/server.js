@@ -6,7 +6,7 @@ const connectDB = require('./config/db');
 
 // Load env from backend/.env (repo root may not contain .env)
 dotenv.config({ path: path.join(__dirname, '.env') });
-connectDB();
+connectDB(); // Re-enabled connection to MongoDB
 const app = express();
 
 app.use(cors());

@@ -1,6 +1,7 @@
 const Policy = require('../models/Policy');
+const User = require('../models/User');
 
-// GET /api/policies/email/:email
+
 const getPoliciesByEmail = async (req, res) => {
   try {
     const email = (req.params.email || '').trim().toLowerCase();
@@ -8,12 +9,21 @@ const getPoliciesByEmail = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email is required' });
     }
 
-    const escapedEmail = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const policies = await Policy.find({
-      'insured.email': { $regex: new RegExp(`^${escapedEmail}$`, 'i') }
-    }).select('policyNumber status effectiveDate expirationDate accountId insured policyType');
+    const matched = await Policy.find({ 'insured.email': new RegExp('^' + email + '$', 'i') });
 
-    if (!policies || policies.length === 0) {
+    const transformedPolicies = matched.map(p => ({
+      policyNumber: p.PolicyNumber || p.policyNumber,
+      status: p.PolicyStatus || p.status || 'Active',
+      effectiveDate: p.EffectiveDate || p.effectiveDate,
+      expirationDate: p.ExpirationDate || p.expirationDate,
+      accountId: p.AccountId || p.accountId,
+      policyType: p.policyType || 'Insurance Policy',
+      insured: {
+        email: p.insured?.email || email
+      }
+    }));
+
+    if (!transformedPolicies || transformedPolicies.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'No policies found for this email'
@@ -22,8 +32,8 @@ const getPoliciesByEmail = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      count: policies.length,
-      data: policies
+      count: transformedPolicies.length,
+      data: transformedPolicies
     });
   } catch (error) {
     res.status(500).json({
