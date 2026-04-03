@@ -4,8 +4,8 @@ import { Policy } from '@/types';
 import { X, FileText, Calendar, MapPin, Shield, Edit2 } from 'lucide-react';
 
 interface PolicyDetailsModalProps {
-  policy: Policy | null;
-  onClose: () => void;
+  readonly policy: Policy | null;
+  readonly onClose: () => void;
 }
 
 export function PolicyDetailsModal({ policy, onClose }: PolicyDetailsModalProps) {
@@ -49,7 +49,7 @@ export function PolicyDetailsModal({ policy, onClose }: PolicyDetailsModalProps)
     return { bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-500' };
   };
 
-  const statusColors = getStatusColor(policy.status);
+  const statusColors = getStatusColor(policy.status || '');
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
@@ -111,11 +111,11 @@ export function PolicyDetailsModal({ policy, onClose }: PolicyDetailsModalProps)
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Effective Date</p>
-                  <p className="text-xl font-bold text-gray-900">{formatDate(policy.effectiveDate)}</p>
+                  <p className="text-xl font-bold text-gray-900">{formatDate(policy.effectiveDate || '')}</p>
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Expiration Date</p>
-                  <p className="text-xl font-bold text-gray-900">{formatDate(policy.expirationDate)}</p>
+                  <p className="text-xl font-bold text-gray-900">{formatDate(policy.expirationDate || '')}</p>
                 </div>
               </div>
             </div>
@@ -139,7 +139,7 @@ export function PolicyDetailsModal({ policy, onClose }: PolicyDetailsModalProps)
               <h3 className="text-lg font-bold text-gray-900 mb-4">Coverage Limits</h3>
               <div className="space-y-3">
                 {policy.coverages.map((coverage, idx) => (
-                  <div key={idx} className="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all">
+                  <div key={coverage.name || `coverage-${idx}`} className="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-700 font-medium">{coverage.name || `Coverage ${idx + 1}`}</span>
                       <span className="text-2xl font-bold text-blue-600">{formatCurrency(coverage.limit || 0)}</span>

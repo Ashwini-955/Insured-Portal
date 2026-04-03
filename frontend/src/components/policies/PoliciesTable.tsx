@@ -5,8 +5,8 @@ import { Policy } from '@/types';
 import { FileText, Download, DollarSign, Eye } from 'lucide-react';
 
 interface PoliciesTableProps {
-  policies: Policy[];
-  onViewDetails: (policy: Policy) => void;
+  readonly policies: readonly Policy[];
+  readonly onViewDetails: (policy: Policy) => void;
 }
 
 export function PoliciesTable({ policies, onViewDetails }: PoliciesTableProps) {
@@ -56,10 +56,10 @@ export function PoliciesTable({ policies, onViewDetails }: PoliciesTableProps) {
   return (
     <div className="space-y-4">
       {policies.map((policy) => {
-        const policyNum = policy.PolicyNumber || policy.policyNumber || 'N/A';
-        const policyStatus = policy.PolicyStatus || policy.status || 'Unknown';
-        const effectiveDate = policy.EffectiveDate || policy.effectiveDate || '';
-        const expirationDate = policy.ExpirationDate || policy.expirationDate || '';
+        const policyNum = policy.policyNumber || 'N/A';
+        const policyStatus = policy.status || 'Unknown';
+        const effectiveDate = policy.effectiveDate || '';
+        const expirationDate = policy.expirationDate || '';
         const address = policy.propertyAddress?.addressLine1 || 'No address available';
         const coverages = policy.coverages || [];
         const statusColors = getStatusColor(policyStatus);
@@ -91,7 +91,7 @@ export function PoliciesTable({ policies, onViewDetails }: PoliciesTableProps) {
                 <h4 className="text-sm font-semibold text-gray-900 mb-3">Coverage Summary:</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {coverages.slice(0, 6).map((coverage, idx) => (
-                    <div key={idx} className="bg-gray-50 rounded-lg p-3">
+                    <div key={coverage.name || `coverage-${idx}`} className="bg-gray-50 rounded-lg p-3">
                       <p className="text-xs text-gray-600 font-medium">{coverage.name || `Coverage ${idx + 1}`}</p>
                       <p className="text-sm font-bold text-gray-900 mt-1">{formatCurrency(coverage.limit || 0)}</p>
                     </div>

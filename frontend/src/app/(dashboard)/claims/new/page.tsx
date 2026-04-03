@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getPoliciesByEmail, createClaim, getClaimsByPolicyNumbers, getBillingByPolicyNumbers } from '@/lib/api';
+import { getPoliciesByEmail, createClaimWithImages, getClaimsByPolicyNumbers, getBillingByPolicyNumbers } from '@/lib/api';
 import type { Policy, Claim, Billing } from '@/types';
 import { ChevronLeft, FileText, Clock, CheckCircle2 } from 'lucide-react';
 
@@ -17,6 +17,7 @@ export default function NewClaimWizard() {
   const [billing, setBilling] = useState<Billing[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
@@ -26,6 +27,8 @@ export default function NewClaimWizard() {
     location: '',
     description: ''
   });
+  
+  const [images, setImages] = useState<File[]>([]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -80,6 +83,13 @@ export default function NewClaimWizard() {
       }
       setError(null);
       setStep(2);
+    } else if (step === 2) {
+      if (images.length === 0) {
+        setError('Please upload at least one image to proceed.');
+        return;
+      }
+      setError(null);
+      setStep(3);
     }
   };
 
@@ -96,15 +106,27 @@ export default function NewClaimWizard() {
     try {
       setIsSubmitting(true);
       setError(null);
-      await createClaim({
+      
+      const fd = new FormData();
+      fd.append('policyNumber', formData.policyNumber);
+      fd.append('incidentDate', formData.incidentDate);
+      fd.append('incidentTime', formData.incidentTime);
+      fd.append('location', formData.location);
+      fd.append('description', formData.description);
+      
+      // Append each selected image to the form data
+      images.forEach(img => fd.append('images', img));
+      
+      const newClaim = await createClaimWithImages(fd);
+      
+      // Store info for the notification page
+      localStorage.setItem('lastClaimFiled', JSON.stringify({
         policyNumber: formData.policyNumber,
-        incidentDate: formData.incidentDate,
-        incidentTime: formData.incidentTime,
-        location: formData.location,
-        description: formData.description
-      });
-      // Skip to a success step or redirect out
-      router.push('/claims');
+        claimNumber: newClaim.ClaimNumber,
+        timestamp: new Date().toISOString()
+      }));
+
+      setIsSuccess(true);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -115,6 +137,26 @@ export default function NewClaimWizard() {
       setIsSubmitting(false);
     }
   };
+
+  if (isSuccess) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-500 flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center text-center max-w-lg w-full">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+            <CheckCircle2 className="w-8 h-8 text-green-600" />
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Claim Submitted Successfully!</h2>
+          <p className="text-gray-500 mb-8">Your claim has been securely transmitted to our processing center. We will notify you once review begins.</p>
+          <button
+            onClick={() => router.push('/claims')}
+            className="w-full px-6 py-3.5 bg-[#1d4ed8] text-white font-semibold rounded-xl hover:bg-blue-800 transition shadow-sm"
+          >
+            Return to Claims Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-500">
@@ -133,11 +175,11 @@ export default function NewClaimWizard() {
           <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
             <div 
               className="h-full bg-blue-600 transition-all duration-500 ease-out"
-              style={{ width: `${(step / 2) * 100}%` }}
+              style={{ width: `${(step / 3) * 100}%` }}
             />
           </div>
           <p className="text-sm font-medium text-gray-500 mt-3 text-right">
-            {step} of 2 steps completed
+            {step} of 3 steps completed
           </p>
         </div>
 
@@ -223,13 +265,63 @@ export default function NewClaimWizard() {
 
           {step === 2 && (
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 py-6">
-               <h2 className="text-xl font-bold text-gray-900 mb-6">Review & Submit</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-6">2. Upload Images</h2>
+              {/* Image Upload Area */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-bold text-gray-900">Upload Images (Required)</h3>
+                <p className="text-xs text-gray-500">Please attach at least one photo of the damage or scene. Max 5 images.</p>
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:bg-gray-50 transition flex flex-col items-center justify-center cursor-pointer relative">
+                  <input 
+                    type="file" 
+                    multiple 
+                    accept="image/jpeg,image/png,image/webp" 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        setImages(Array.from(e.target.files).slice(0, 5));
+                      }
+                    }}
+                  />
+                  <div className="text-center">
+                    <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <p className="mt-1 text-sm text-gray-600">
+                      <span className="font-medium text-blue-600 hover:text-blue-500">Upload files</span> or drag and drop
+                    </p>
+                  </div>
+                </div>
+                
+                {images.length > 0 && (
+                  <ul className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {images.map((img, i) => (
+                      <li key={i} className="text-xs flex items-center bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg">
+                        <span className="truncate flex-1">{img.name}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 py-6">
+               <h2 className="text-xl font-bold text-gray-900 mb-6">3. Review & Submit</h2>
                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 space-y-4">
                  <div className="grid grid-cols-2 gap-4 text-sm">
                    <div><span className="text-gray-500">Policy ID:</span> <span className="font-semibold text-gray-900">{formData.policyNumber}</span></div>
                    <div><span className="text-gray-500">Date:</span> <span className="font-semibold text-gray-900">{formData.incidentDate}</span></div>
                    <div><span className="text-gray-500">Location:</span> <span className="font-semibold text-gray-900">{formData.location || 'N/A'}</span></div>
                    <div className="col-span-2"><span className="text-gray-500">Description:</span> <p className="font-semibold text-gray-900 mt-1 whitespace-pre-wrap">{formData.description}</p></div>
+                   <div className="col-span-2 mt-2 pt-4 border-t border-gray-200">
+                     <span className="text-gray-500 block mb-2">Attached Images:</span>
+                     <div className="flex flex-wrap gap-2">
+                       {images.map((img, i) => (
+                         <span key={i} className="inline-block bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded border border-blue-100">{img.name}</span>
+                       ))}
+                     </div>
+                   </div>
                  </div>
                </div>
             </div>
@@ -247,7 +339,7 @@ export default function NewClaimWizard() {
             Back
           </button>
 
-          {step < 2 ? (
+          {step < 3 ? (
             <button
               onClick={handleNext}
               className="px-6 py-2.5 bg-[#1d4ed8] text-white text-sm font-semibold rounded-lg hover:bg-blue-800 transition-colors shadow-sm"
@@ -265,32 +357,6 @@ export default function NewClaimWizard() {
           )}
         </div>
 
-      </div>
-
-      {/* Footer Timeline Graphic */}
-      <div className="mt-8 flex items-center justify-center max-w-2xl mx-auto">
-        <div className="flex items-center space-x-2 text-blue-600 flex-1 justify-center">
-          <div className="flex flex-col items-center">
-             <FileText className="w-6 h-6 mb-2" />
-             <span className="text-xs font-bold uppercase tracking-wider">Submitted</span>
-          </div>
-          <div className="h-1 w-16 bg-blue-600 rounded-full mx-4 mb-5" />
-        </div>
-        
-        <div className="flex items-center space-x-2 text-gray-400 flex-1 justify-center">
-          <div className="flex flex-col items-center">
-             <Clock className="w-6 h-6 mb-2" />
-             <span className="text-xs font-bold uppercase tracking-wider">Under Review</span>
-          </div>
-          <div className="h-1 w-16 bg-gray-200 rounded-full mx-4 mb-5" />
-        </div>
-
-        <div className="flex items-center space-x-2 text-gray-400 flex-1 justify-center">
-          <div className="flex flex-col items-center">
-             <CheckCircle2 className="w-6 h-6 mb-2" />
-             <span className="text-xs font-bold uppercase tracking-wider">Approved/Denied</span>
-          </div>
-        </div>
       </div>
 
     </div>
