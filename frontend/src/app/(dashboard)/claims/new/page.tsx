@@ -206,7 +206,7 @@ export default function NewClaimWizard() {
                     disabled={isLoading}
                   >
                     <option value="" disabled>Select Policy...</option>
-                    {policies.map(p => (
+                    {policies.filter(p => (p.status || '').toLowerCase() === 'active').map(p => (
                       <option key={p.policyNumber} value={p.policyNumber}>
                         {p.policyNumber} ({p.policyType || 'Policy'})
                       </option>
