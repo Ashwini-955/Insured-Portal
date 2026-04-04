@@ -123,7 +123,10 @@ export default function ClaimsTable({ claims = [] }: { claims?: Claim[] }) {
             {filteredClaims.map((claim) => (
               <tr key={claim.ClaimNumber} className="hover:bg-gray-50 transition-colors">
                 <td className="px-4 md:px-5 py-3 md:py-4 font-bold text-gray-900 whitespace-nowrap">{claim.ClaimNumber}</td>
-                <td className="px-4 md:px-6 py-3 md:py-4 text-gray-700 font-medium">{claim.DescriptionOfLoss || claim.AccidentCode}</td>
+                <td className="px-4 md:px-6 py-3 md:py-4 text-gray-700 font-medium">
+                  {claim.AccidentCode || 
+                   (claim.DescriptionOfLoss ? (claim.DescriptionOfLoss.length > 50 ? claim.DescriptionOfLoss.substring(0, 50) + '...' : claim.DescriptionOfLoss) : '')}
+                </td>
                 <td className="px-4 md:px-6 py-3 md:py-4 text-gray-600">{formatCurrency(claim.PaidLoss || 0)}</td>
                 <td className="px-4 md:px-6 py-3 md:py-4 text-gray-500">{formatDate(claim.LossDate)}</td>
                 <td className="px-4 md:px-6 py-3 md:py-4">
