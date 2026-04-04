@@ -52,7 +52,7 @@ export default function PoliciesPage() {
     if (activeTab === 'active') {
       result = result.filter((p) => p.status?.toLowerCase() === 'active');
     } else if (activeTab === 'expired') {
-      result = result.filter((p) => p.status?.toLowerCase() === 'expired');
+      result = result.filter((p) => p.status?.toLowerCase() === 'expired' || p.status?.toLowerCase().includes('cancel'));
     } else if (activeTab === 'upcoming') {
       const now = new Date();
       result = result.filter((p) => {
@@ -77,7 +77,7 @@ export default function PoliciesPage() {
 
   // Count policies by status
   const activePolicies = policies.filter((p) => p.status?.toLowerCase() === 'active').length;
-  const expiredPolicies = policies.filter((p) => p.status?.toLowerCase() === 'expired').length;
+  const expiredPolicies = policies.filter((p) => p.status?.toLowerCase() === 'expired' || p.status?.toLowerCase().includes('cancel')).length;
   const upcomingPolicies = policies.filter((p) => {
     const expDate = p.expirationDate ? new Date(p.expirationDate) : null;
     return expDate && expDate > new Date() && p.status?.toLowerCase() !== 'active';

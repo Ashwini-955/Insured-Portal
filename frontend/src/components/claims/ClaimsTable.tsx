@@ -78,7 +78,7 @@ export default function ClaimsTable({ claims = [] }: { claims?: Claim[] }) {
             <option value="pending">Pending</option>
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
-            <option value="closed">Closed</option>
+            <option value="active">Active</option>
           </select>
 
           {/* Sort */}

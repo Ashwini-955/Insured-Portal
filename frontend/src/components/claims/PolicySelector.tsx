@@ -36,7 +36,7 @@ export default function PolicySelector({
   const getPolicyStatusBadge = (status: string) => {
     const s = status.toLowerCase();
     if (s === 'active') {
-      return <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-500 text-white shadow-sm">Active</span>;
+      return <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-700 text-white shadow-sm">Active</span>;
     } else if (s.includes('pending')) {
       return <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-500 text-white shadow-sm">Pending</span>;
     } else if (s.includes('cancel')) {
@@ -76,6 +76,11 @@ export default function PolicySelector({
                       <p className="text-xs text-gray-500 font-medium">{policy.id}</p>
                     </div>
                   </div>
+                  {!policy.active && (
+                    <span className="bg-red-50 text-red-600 border border-red-200 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ml-2">
+                      Expired
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center justify-between mt-1 pt-1 border-t border-gray-50/50">
                   <span className="text-xs font-semibold text-gray-500">Status:</span>
@@ -113,6 +118,11 @@ export default function PolicySelector({
                     <p className="text-xs text-gray-500 font-medium">{policy.id}</p>
                   </div>
                 </div>
+                {!policy.active && (
+                  <span className="bg-red-50 text-red-600 border border-red-200 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider ml-3">
+                    Expired
+                  </span>
+                )}
               </div>
               <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50/50">
                 <span className="text-xs font-semibold text-gray-500">Status:</span>
