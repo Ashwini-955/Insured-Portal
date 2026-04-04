@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getPoliciesByEmail, createClaimWithImages, getClaimsByPolicyNumbers, getBillingByPolicyNumbers } from '@/lib/api';
 import type { Policy, Claim, Billing } from '@/types';
-import { ChevronLeft, FileText, Clock, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, FileText, Clock, CheckCircle2, Sparkles } from 'lucide-react';
+import { config } from '@/config/env';
 
 export default function NewClaimWizard() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function NewClaimWizard() {
   const [billing, setBilling] = useState<Billing[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,6 +27,7 @@ export default function NewClaimWizard() {
     incidentDate: '',
     incidentTime: '',
     location: '',
+    accidentCode: '',
     description: ''
   });
   
@@ -71,21 +74,17 @@ export default function NewClaimWizard() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const validateStep1 = () => {
-    return !!(formData.policyNumber && formData.incidentDate && formData.description);
-  };
-
   const handleNext = () => {
     if (step === 1) {
-      if (!validateStep1()) {
-        setError('Please fill in required fields: Policy ID, Date, and Description.');
+      if (images.length === 0 || !formData.policyNumber || !formData.incidentDate || !formData.accidentCode) {
+        setError('Please select a policy, date, short title, and upload at least one image to proceed.');
         return;
       }
       setError(null);
       setStep(2);
     } else if (step === 2) {
-      if (images.length === 0) {
-        setError('Please upload at least one image to proceed.');
+      if (!formData.description) {
+        setError('Please provide a description.');
         return;
       }
       setError(null);
@@ -102,6 +101,48 @@ export default function NewClaimWizard() {
     }
   };
 
+  const handleGenerateAI = async () => {
+    if (images.length === 0) {
+      setError('Please upload an image first.');
+      return;
+    }
+    
+    try {
+      setIsGeneratingAI(true);
+      setError(null);
+      
+      const base64Images = await Promise.all(
+        images.map(img => new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = error => reject(error);
+          reader.readAsDataURL(img);
+        }))
+      );
+
+      const response = await fetch(`${config.api.baseUrl}/ai/analyze-images`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ images: base64Images })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setFormData(prev => ({ ...prev, description: data.description }));
+      } else {
+        throw new Error(data.message || 'Failed to generate description');
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An error occurred during AI generation.');
+      }
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
@@ -112,6 +153,7 @@ export default function NewClaimWizard() {
       fd.append('incidentDate', formData.incidentDate);
       fd.append('incidentTime', formData.incidentTime);
       fd.append('location', formData.location);
+      fd.append('accidentCode', formData.accidentCode);
       fd.append('description', formData.description);
       
       // Append each selected image to the form data
@@ -192,9 +234,9 @@ export default function NewClaimWizard() {
           )}
 
           {step === 1 && (
-            <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">1. Incident Details</h2>
-              
+            <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 py-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">1. Incident Details & Evidence</h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700">Policy ID</label>
@@ -247,27 +289,22 @@ export default function NewClaimWizard() {
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900"
                   />
                 </div>
+                
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-bold text-gray-700">Short Incident Title</label>
+                  <input
+                    type="text"
+                    name="accidentCode"
+                    value={formData.accidentCode}
+                    onChange={handleChange}
+                    placeholder="e.g., Roof Damage from Storm"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2 pt-2">
-                <label className="text-sm font-bold text-gray-700">Description of Incident</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Provide a detailed description of the incident"
-                  rows={4}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900 resize-none"
-                />
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 py-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">2. Upload Images</h2>
               {/* Image Upload Area */}
-              <div className="space-y-4">
+              <div className="space-y-4 pt-6 mt-4 border-t border-gray-100">
                 <h3 className="text-sm font-bold text-gray-900">Upload Images (Required)</h3>
                 <p className="text-xs text-gray-500">Please attach at least one photo of the damage or scene. Max 5 images.</p>
                 <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:bg-gray-50 transition flex flex-col items-center justify-center cursor-pointer relative">
@@ -305,6 +342,35 @@ export default function NewClaimWizard() {
             </div>
           )}
 
+          {step === 2 && (
+            <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 py-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">2. Description of Loss</h2>
+              
+              <div className="space-y-2 pt-2">
+                <div className="flex justify-between items-end">
+                  <label className="text-sm font-bold text-gray-700">Description of Incident</label>
+                  <button
+                    type="button"
+                    onClick={handleGenerateAI}
+                    disabled={isGeneratingAI}
+                    className="text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors border border-blue-200 disabled:opacity-50"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {isGeneratingAI ? 'Generating...' : 'Take Help of AI'}
+                  </button>
+                </div>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Provide a detailed description of the incident"
+                  rows={8}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-900 resize-none"
+                />
+              </div>
+            </div>
+          )}
+
           {step === 3 && (
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 py-6">
                <h2 className="text-xl font-bold text-gray-900 mb-6">3. Review & Submit</h2>
@@ -313,6 +379,7 @@ export default function NewClaimWizard() {
                    <div><span className="text-gray-500">Policy ID:</span> <span className="font-semibold text-gray-900">{formData.policyNumber}</span></div>
                    <div><span className="text-gray-500">Date:</span> <span className="font-semibold text-gray-900">{formData.incidentDate}</span></div>
                    <div><span className="text-gray-500">Location:</span> <span className="font-semibold text-gray-900">{formData.location || 'N/A'}</span></div>
+                   <div className="col-span-2"><span className="text-gray-500">Title:</span> <span className="font-semibold text-gray-900">{formData.accidentCode}</span></div>
                    <div className="col-span-2"><span className="text-gray-500">Description:</span> <p className="font-semibold text-gray-900 mt-1 whitespace-pre-wrap">{formData.description}</p></div>
                    <div className="col-span-2 mt-2 pt-4 border-t border-gray-200">
                      <span className="text-gray-500 block mb-2">Attached Images:</span>
