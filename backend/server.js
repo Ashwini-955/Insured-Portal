@@ -18,6 +18,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/policies', require('./routes/policyRoutes'));
 app.use('/api/claims',   require('./routes/claimRoutes'));
 app.use('/api/billing',  require('./routes/billingRoutes'));
+app.use('/api/ai',       require('./routes/aiRoutes'));
 
 app.get('/', (req, res) => {
   res.json({
