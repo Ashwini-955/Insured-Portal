@@ -29,7 +29,7 @@ const getClaimsByPolicyNumbers = async (req, res) => {
 const createClaim = async (req, res) => {
   try {
     // fields will be in req.body, files in req.files
-    const { policyNumber, incidentDate, incidentTime, location, description } = req.body;
+    const { policyNumber, incidentDate, incidentTime, location, description, accidentCode } = req.body;
     
     // Extract uploaded image URLs from multer 'req.files'
     const imagePaths = req.files ? req.files.map(file => file.path) : [];
@@ -51,6 +51,7 @@ const createClaim = async (req, res) => {
       LossDate: incidentDate,
       ReceivedDate: new Date().toISOString().split('T')[0],
       DescriptionOfLoss: description,
+      AccidentCode: accidentCode,
       Location: location,
       IncidentTime: incidentTime,
       PaidLoss: 0,
