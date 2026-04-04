@@ -2,8 +2,8 @@
   {
     "PolicyNumber": "FPP1900008896-00",
     "payPlanDesc": "Monthly - NB",
-    "isRecurringPayment": true,
-    "accountTotalBalance": 12765.79,
+    "isRecurringPayment": false,
+    "accountTotalBalance": 0,
     "currentDueDate": null,
     "currentAmountDue": 0,
     "projectedStatements": [
@@ -30,29 +30,81 @@
         "statementDueDate": "2026-01-15T00:00:00",
         "statementTotalAmountDue": 1361.55,
         "statementDurationPaid": 1361.55
-      },
+      }
+    ]
+  },
+  {
+    "PolicyNumber": "FPP2000002139-00",
+    "payPlanDesc": "Monthly - Renewal",
+    "isRecurringPayment": true,
+    "accountTotalBalance": 5000.00,
+    "currentDueDate": "2026-05-15T00:00:00",
+    "currentAmountDue": 500.00,
+    "projectedStatements": [
       {
-        "status": "Future",
-        "policy": "FPP1900008896-00",
+        "status": "Paid",
+        "policy": "FPP2000002139-00",
         "statementDate": "2026-02-12T00:00:00",
         "statementDueDate": "2026-02-15T00:00:00",
-        "statementTotalAmountDue": 1894.58,
-        "statementDurationPaid": 0
+        "statementTotalAmountDue": 500.00,
+        "statementDurationPaid": 500.00
       },
       {
-        "status": "Future",
-        "policy": "FPP1900008896-00",
+        "status": "Paid",
+        "policy": "FPP2000002139-00",
         "statementDate": "2026-03-12T00:00:00",
         "statementDueDate": "2026-03-15T00:00:00",
-        "statementTotalAmountDue": 1564.44,
+        "statementTotalAmountDue": 500.00,
+        "statementDurationPaid": 500.00
+      },
+      {
+        "status": "Future",
+        "policy": "FPP2000002139-00",
+        "statementDate": "2026-04-12T00:00:00",
+        "statementDueDate": "2026-04-15T00:00:00",
+        "statementTotalAmountDue": 500.00,
         "statementDurationPaid": 0
       },
       {
         "status": "Future",
-        "policy": "FPP1900008896-00",
-        "statementDate": "2026-04-12T00:00:00",
-        "statementDueDate": "2026-04-15T00:00:00",
-        "statementTotalAmountDue": 1564.44,
+        "policy": "FPP2000002139-00",
+        "statementDate": "2026-05-12T00:00:00",
+        "statementDueDate": "2026-05-15T00:00:00",
+        "statementTotalAmountDue": 500.00,
+        "statementDurationPaid": 0
+      }
+    ]
+  },
+  {
+    "PolicyNumber": "FPP2025001234-00",
+    "payPlanDesc": "Quarterly - NB",
+    "isRecurringPayment": true,
+    "accountTotalBalance": 12000.00,
+    "currentDueDate": "2026-06-01T00:00:00",
+    "currentAmountDue": 3000.00,
+    "projectedStatements": [
+      {
+        "status": "Paid",
+        "policy": "FPP2025001234-00",
+        "statementDate": "2026-03-01T00:00:00",
+        "statementDueDate": "2026-03-05T00:00:00",
+        "statementTotalAmountDue": 3000.00,
+        "statementDurationPaid": 3000.00
+      },
+      {
+        "status": "Future",
+        "policy": "FPP2025001234-00",
+        "statementDate": "2026-06-01T00:00:00",
+        "statementDueDate": "2026-06-05T00:00:00",
+        "statementTotalAmountDue": 3000.00,
+        "statementDurationPaid": 0
+      },
+      {
+        "status": "Future",
+        "policy": "FPP2025001234-00",
+        "statementDate": "2026-09-01T00:00:00",
+        "statementDueDate": "2026-09-05T00:00:00",
+        "statementTotalAmountDue": 3000.00,
         "statementDurationPaid": 0
       }
     ]
