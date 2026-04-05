@@ -37,19 +37,15 @@ export function PolicyDetailsModal({ policy, onClose }: PolicyDetailsModalProps)
     ? `${address.city}, ${address.state} ${address.zipCode}`
     : '';
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadgeClasses = (status: string) => {
     const s = status?.toLowerCase() || '';
-    if (s === 'active') {
-      return { bg: 'bg-emerald-100', text: 'text-emerald-700', dot: 'bg-emerald-500' };
-    } else if (s === 'expired' || s === 'cancelled') {
-      return { bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500' };
-    } else if (s === 'pending' || s === 'pending review') {
-      return { bg: 'bg-amber-100', text: 'text-amber-700', dot: 'bg-amber-500' };
-    }
-    return { bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-500' };
+    if (s === 'active') return 'bg-green-500 text-white';
+    if (s === 'expired' || s === 'cancelled') return 'bg-red-500 text-white';
+    if (s === 'pending' || s === 'pending review') return 'bg-orange-500 text-white';
+    return 'bg-gray-100 text-gray-800';
   };
 
-  const statusColors = getStatusColor(policy.status || '');
+  const statusBadgeClasses = getStatusBadgeClasses(policy.status || '');
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
@@ -77,8 +73,7 @@ export function PolicyDetailsModal({ policy, onClose }: PolicyDetailsModalProps)
               <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">Policy Number</p>
               <h3 className="text-3xl font-bold text-gray-900">{policy.policyNumber}</h3>
             </div>
-            <span className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-bold whitespace-nowrap ${statusColors.bg} ${statusColors.text}`}>
-              <span className={`inline-block w-3 h-3 ${statusColors.dot} rounded-full mr-2`}></span>
+            <span className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap shadow-sm ${statusBadgeClasses}`}>
               {policy.status || 'Unknown'}
             </span>
           </div>

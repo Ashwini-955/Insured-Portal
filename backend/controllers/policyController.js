@@ -20,7 +20,9 @@ const getPoliciesByEmail = async (req, res) => {
       policyType: p.policyType || 'Insurance Policy',
       insured: {
         email: p.insured?.email || email
-      }
+      },
+      propertyAddress: p.propertyAddress || null,
+      coverages: p.coverages || []
     }));
 
     if (!transformedPolicies || transformedPolicies.length === 0) {
