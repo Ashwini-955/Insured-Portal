@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Root package.json to run frontend and backend concurrently",
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\"",
+    "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && npm run dev\"",
     "install:all": "npm install && npm install --prefix frontend && npm install --prefix backend"
   },
   "devDependencies": {

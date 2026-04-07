@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Download, FileText, ExternalLink } from 'lucide-react';
 import { formatDate } from '@/utils/formatDate';
 import { formatCurrency } from '@/utils/formatCurrency';
@@ -65,9 +66,9 @@ export default function InvoiceHistoryTable({ billing }: { billing: Billing | nu
                     {formatDate(invoice.statementDueDate)}
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <button className="text-gray-400 hover:text-red-500 transition-colors" title="Dispute this invoice">
+                    <Link href={`/support?disputeInvoiceId=${invoiceId}`} className="text-gray-400 hover:text-red-500 transition-colors inline-block" title="Dispute this invoice">
                       <ExternalLink className="w-4 h-4 mx-auto" strokeWidth={2.5} />
-                    </button>
+                    </Link>
                   </td>
                   <td className="px-6 py-4 text-right font-bold text-gray-800 whitespace-nowrap">
                     {formatCurrency(invoice.statementTotalAmountDue || 0)}
