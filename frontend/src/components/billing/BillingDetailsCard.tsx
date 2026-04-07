@@ -56,6 +56,7 @@ export default function BillingDetailsCard({ billing }: { billing: Billing | nul
       });
       const timestamp = new Date().toISOString();
       localStorage.setItem('lastPaymentEmail', JSON.stringify({ policyNumber: billing.PolicyNumber, timestamp }));
+      window.dispatchEvent(new Event('notification-updated'));
       setLastEmailSent(timestamp);
       alert('Payment email sent successfully!');
     } catch (error) {
