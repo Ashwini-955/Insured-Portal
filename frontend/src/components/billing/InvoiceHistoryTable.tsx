@@ -4,7 +4,12 @@ import { formatDate } from '@/utils/formatDate';
 import { formatCurrency } from '@/utils/formatCurrency';
 import type { Billing } from '@/types';
 
-export default function InvoiceHistoryTable({ billing }: { billing: Billing | null }) {
+interface Props {
+  billing: Billing | null;
+  onView: (invoice: any) => void;
+}
+
+export default function InvoiceHistoryTable({ billing, onView }: Props) {
   if (!billing || !billing.projectedStatements || billing.projectedStatements.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center mt-8">
@@ -77,13 +82,12 @@ export default function InvoiceHistoryTable({ billing }: { billing: Billing | nu
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-3 text-xs font-bold text-blue-600">
-                      <button className="flex items-center gap-1 hover:text-blue-800 transition-colors">
+                      <button
+                        onClick={() => onView({ ...invoice, invoiceId })}
+                        className="flex items-center gap-1 hover:text-blue-800 transition-colors"
+                      >
                         <span>View</span>
                         <FileText className="w-3.5 h-3.5" />
-                      </button>
-                      <button className="flex items-center gap-1 hover:text-blue-800 transition-colors text-gray-500 hover:text-gray-800">
-                        <span>Download</span>
-                        <Download className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </td>
