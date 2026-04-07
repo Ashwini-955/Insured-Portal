@@ -5,6 +5,5 @@ export const NAV_ITEMS = [
   { href: '/billing', label: 'Billing & Payments', icon: '💳' },
   { href: '/documents', label: 'Document Center', icon: '📁' },
   { href: '/notifications', label: 'Notifications', icon: '🔔' },
-  { href: '/profile', label: 'Profile Settings', icon: '⚙️' },
   { href: '/support', label: 'Support', icon: '❓' },
 ];
