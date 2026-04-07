@@ -10,7 +10,8 @@ import PolicySelector from '@/components/claims/PolicySelector';
 import SelectedPolicySummary from '@/components/billing/SelectedPolicySummary';
 import BillingDetailsCard from '@/components/billing/BillingDetailsCard';
 import AutoPayCard from '@/components/billing/AutoPayCard';
-import InvoiceHistoryTable from '@/components/billing/InvoiceHistoryTable';
+import InvoiceHistoryTable from "@/components/billing/InvoiceHistoryTable";
+import InvoiceDetailsModal from "@/components/billing/InvoiceDetailsModal";
 
 export default function BillingPage() {
   const { user } = useAuth();
@@ -18,6 +19,8 @@ export default function BillingPage() {
   const [billings, setBillings] = useState<Billing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
   
   // By default, we select the first policy (handled after fetch)
   const [selectedPolicyId, setSelectedPolicyId] = useState<string | null>(null);
@@ -129,12 +132,24 @@ export default function BillingPage() {
             <AutoPayCard billing={selectedBilling} />
           </div>
 
-          <InvoiceHistoryTable billing={selectedBilling} />
+          <InvoiceHistoryTable
+            billing={selectedBilling}
+            onView={(invoice) => {
+              setSelectedInvoice(invoice);
+              setOpenModal(true);
+            }}
+          />
         </div>
       ) : (
         <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-8 text-center mt-8">
            <p className="text-blue-700 font-bold">Please select a policy to view billing details.</p>
         </div>
+      )}
+      {openModal && (
+        <InvoiceDetailsModal
+          invoice={selectedInvoice}
+          onClose={() => setOpenModal(false)}
+        />
       )}
     </div>
   );
