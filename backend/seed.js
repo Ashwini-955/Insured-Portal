@@ -35,10 +35,42 @@ const seedData = async () => {
         console.log('Cleared existing data.');
 
         // Insert new data
-        await User.insertMany(usersData);
-        await Policy.insertMany(policiesData);
-        await Claim.insertMany(claimsData);
-        await Billing.insertMany(billingsData);
+        const mappedUsers = usersData.map(u => ({ ...u, email: u.email, password: u.password, firstName: u.firstName, lastName: u.lastName }));
+        await User.insertMany(mappedUsers);
+
+        const mappedPolicies = policiesData.map(p => {
+            let pType = 'Insurance Policy';
+            if (p.PolicyNumber === 'FPP2000002139-00') pType = 'Home Insurance';
+            else if (p.PolicyNumber === 'FPP1900008896-00') pType = 'Farm Insurance';
+            else if (p.PolicyNumber === 'FPP2025001234-00') pType = 'Vehicle Insurance';
+            
+            return {
+                ...p,
+                policyNumber: p.PolicyNumber,
+                accountId: p.AccountId,
+                policyType: pType,
+                status: p.PolicyStatus || p.status || 'Active',
+                insured: {
+                    email: p.ClientInformation?.Communications?.find(c => c.Type === 'Email')?.Value || ''
+                }
+            };
+        });
+        await Policy.insertMany(mappedPolicies);
+
+        const mappedClaims = claimsData.map(c => ({
+            ...c,
+            claimId: c.ClaimNumber || c.claimId || 'Unknown',
+            policyId: c.PolicyNumber || c.policyId || 'Unknown',
+            status: c.ClaimStatus || c.status || 'Open'
+        }));
+        await Claim.insertMany(mappedClaims);
+
+        const mappedBilling = billingsData.map(b => ({
+            ...b,
+            accountId: b.AccountId || b.accountId || 'Unknown',
+            status: b.status || 'Active'
+        }));
+        await Billing.insertMany(mappedBilling);
 
         console.log('Seed data successfully added!');
         process.exit(0);
