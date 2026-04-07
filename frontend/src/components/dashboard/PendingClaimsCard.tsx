@@ -37,12 +37,12 @@ export function PendingClaimsCard({
           {pending.slice(0, 3).map((c) => (
             <li key={c.ClaimNumber} className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm font-medium text-slate-900 truncate" title={c.AccidentCode || c.DescriptionOfLoss || c.ClaimNumber}>
+                <p className="text-base font-medium text-slate-900 truncate" title={c.AccidentCode || c.DescriptionOfLoss || c.ClaimNumber}>
                   {c.AccidentCode || c.DescriptionOfLoss || c.ClaimNumber}
                 </p>
-                <p className="text-[11px] text-slate-500 mt-1">Filed: {formatDate(c.ReceivedDate)}</p>
+                <p className="text-xs text-slate-500 mt-1">Filed: {formatDate(c.ReceivedDate)}</p>
               </div>
-              <span className="shrink-0 text-[11px] px-2 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 uppercase tracking-wider font-medium">
+              <span className="shrink-0 text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 uppercase tracking-wider font-medium">
                 {c.Status}
               </span>
             </li>
