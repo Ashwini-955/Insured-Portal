@@ -167,6 +167,7 @@ export default function NewClaimWizard() {
         claimNumber: newClaim.ClaimNumber,
         timestamp: new Date().toISOString()
       }));
+      window.dispatchEvent(new Event('notification-updated'));
 
       setIsSuccess(true);
     } catch (err) {
