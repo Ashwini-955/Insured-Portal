@@ -4,6 +4,8 @@ import { Download, FileText, ExternalLink } from 'lucide-react';
 import { formatDate } from '@/utils/formatDate';
 import { formatCurrency } from '@/utils/formatCurrency';
 import type { Billing } from '@/types';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function InvoiceHistoryTable({ billing }: { billing: Billing | null }) {
   if (!billing || !billing.projectedStatements || billing.projectedStatements.length === 0) {
@@ -26,11 +28,49 @@ export default function InvoiceHistoryTable({ billing }: { billing: Billing | nu
     return <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-800 uppercase tracking-wider">{status}</span>;
   };
 
+  const handleDownloadAll = () => {
+    if (!billing || !billing.projectedStatements || billing.projectedStatements.length === 0) return;
+
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('Invoice History', 14, 22);
+
+    const tableColumn = ["Invoice ID", "Issue Date", "Due Date", "Amount", "Status"];
+    const tableRows: any[] = [];
+
+    billing.projectedStatements.forEach((invoice, idx) => {
+      const invoiceId = `INV-${new Date(invoice.statementDate || invoice.statementDueDate).getFullYear()}-${String(idx + 1).padStart(3, '0')}`;
+      const issueDate = invoice.statementDate ? formatDate(invoice.statementDate) : '-';
+      const dueDate = formatDate(invoice.statementDueDate);
+      const amount = formatCurrency(invoice.statementTotalAmountDue || 0);
+      const status = invoice.status;
+
+      tableRows.push([
+        invoiceId,
+        issueDate,
+        dueDate,
+        amount,
+        status
+      ]);
+    });
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+      theme: 'striped',
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [248, 250, 252], textColor: [100, 116, 139], fontStyle: 'bold' },
+    });
+
+    doc.save('invoice_history.pdf');
+  };
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mt-8">
       <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 className="text-xl font-bold text-gray-900">Invoice History</h2>
-        <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold transition-colors shadow-sm w-fit" onClick={() => {}}>
+        <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold transition-colors shadow-sm w-fit" onClick={handleDownloadAll}>
           <Download className="w-4 h-4" />
           <span>Download All</span>
         </button>
@@ -46,7 +86,6 @@ export default function InvoiceHistoryTable({ billing }: { billing: Billing | nu
               <th className="px-6 py-4 whitespace-nowrap text-center">Raise a Dispute</th>
               <th className="px-6 py-4 whitespace-nowrap text-right">Amount</th>
               <th className="px-6 py-4 whitespace-nowrap text-center">Status</th>
-              <th className="px-6 py-4 whitespace-nowrap text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -75,18 +114,6 @@ export default function InvoiceHistoryTable({ billing }: { billing: Billing | nu
                   </td>
                   <td className="px-6 py-4 text-center">
                     {getStatusBadge(invoice.status)}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-3 text-xs font-bold text-blue-600">
-                      <button className="flex items-center gap-1 hover:text-blue-800 transition-colors">
-                        <span>View</span>
-                        <FileText className="w-3.5 h-3.5" />
-                      </button>
-                      <button className="flex items-center gap-1 hover:text-blue-800 transition-colors text-gray-500 hover:text-gray-800">
-                        <span>Download</span>
-                        <Download className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
                   </td>
                 </tr>
               );
