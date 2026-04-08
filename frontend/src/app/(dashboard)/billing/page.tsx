@@ -125,8 +125,7 @@ export default function BillingPage() {
 
       {selectedPolicyId ? (
         <div className="animate-in slide-in-from-bottom-4 duration-500">
-          <SelectedPolicySummary policy={selectedPolicy} />
-          
+          <SelectedPolicySummary policy={selectedPolicy} user={user} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <BillingDetailsCard billing={selectedBilling} />
             <AutoPayCard billing={selectedBilling} />
