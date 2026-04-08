@@ -1,5 +1,5 @@
-import React from 'react';
-import { Download, FileText, ExternalLink } from 'lucide-react';
+import React, {useState, useEffect} from 'react';
+import { Download, ExternalLink } from 'lucide-react';
 import { formatDate } from '@/utils/formatDate';
 import { formatCurrency } from '@/utils/formatCurrency';
 import type { Billing } from '@/types';
@@ -10,6 +10,12 @@ interface Props {
 }
 
 export default function InvoiceHistoryTable({ billing, onView }: Props) {
+  const [visibleCount, setVisibleCount] = useState(5);
+
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [billing]);
+
   if (!billing || !billing.projectedStatements || billing.projectedStatements.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center mt-8">
@@ -17,7 +23,7 @@ export default function InvoiceHistoryTable({ billing, onView }: Props) {
       </div>
     );
   }
-
+  
   const getStatusBadge = (status: string) => {
     const s = status.toLowerCase();
     if (s === 'paid') {
@@ -50,11 +56,11 @@ export default function InvoiceHistoryTable({ billing, onView }: Props) {
               <th className="px-6 py-4 whitespace-nowrap text-center">Raise a Dispute</th>
               <th className="px-6 py-4 whitespace-nowrap text-right">Amount</th>
               <th className="px-6 py-4 whitespace-nowrap text-center">Status</th>
-              <th className="px-6 py-4 whitespace-nowrap text-right">Actions</th>
+          
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {billing.projectedStatements.map((invoice, idx) => {
+            {billing.projectedStatements.slice(0, visibleCount).map((invoice, idx) => {
               // Creating a mock invoice ID for display since not immediately present in projectedStatements map
               const invoiceId = `INV-${new Date(invoice.statementDate || invoice.statementDueDate).getFullYear()}-${String(idx + 1).padStart(3, '0')}`;
               
@@ -80,17 +86,8 @@ export default function InvoiceHistoryTable({ billing, onView }: Props) {
                   <td className="px-6 py-4 text-center">
                     {getStatusBadge(invoice.status)}
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-3 text-xs font-bold text-blue-600">
-                      <button
-                        onClick={() => onView({ ...invoice, invoiceId })}
-                        className="flex items-center gap-1 hover:text-blue-800 transition-colors"
-                      >
-                        <span>View</span>
-                        <FileText className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </td>
+                  
+                    
                 </tr>
               );
             })}
@@ -99,11 +96,16 @@ export default function InvoiceHistoryTable({ billing, onView }: Props) {
       </div>
       
       {/* Load More Footer */}
-      <div className="p-4 border-t border-gray-100 flex justify-end bg-gray-50/50">
-        <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 font-bold text-xs rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
-          Load More
-        </button>
-      </div>
+<div className="p-4 border-t border-gray-100 flex justify-end bg-gray-50/50">
+  {billing.projectedStatements.length > 5 && (
+    <button
+      onClick={() => setVisibleCount((prev) => prev + 5)}
+      className="px-4 py-2 bg-white border border-gray-300 text-gray-700 font-bold text-xs rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+    >
+      Load More
+    </button>
+  )}
+</div>
     </div>
   );
 }
