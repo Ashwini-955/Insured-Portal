@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getPoliciesByEmail, getBillingByPolicyNumbers } from '@/lib/api';
 import type { Policy, Billing } from '@/types';
@@ -14,6 +15,7 @@ import InvoiceHistoryTable from '@/components/billing/InvoiceHistoryTable';
 
 export default function BillingPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [billings, setBillings] = useState<Billing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,6 +23,14 @@ export default function BillingPage() {
   
   // By default, we select the first policy (handled after fetch)
   const [selectedPolicyId, setSelectedPolicyId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Set selected policy from URL query parameter if provided
+    const policyFromUrl = searchParams.get('policyId');
+    if (policyFromUrl) {
+      setSelectedPolicyId(policyFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -47,11 +57,14 @@ export default function BillingPage() {
           return;
         }
 
-        // Default to selecting the first active policy, or just the very first one
-        const initialSelection = p.find(val => val.status?.toLowerCase() === 'active')?.policyNumber 
+        // If policyId from URL was provided, use it; otherwise default to first active or first policy
+        const initialSelection = searchParams.get('policyId') 
+                              || p.find(val => val.status?.toLowerCase() === 'active')?.policyNumber 
                               || (p.length > 0 ? p[0].policyNumber : null);
         
-        setSelectedPolicyId(initialSelection);
+        if (initialSelection && !selectedPolicyId) {
+          setSelectedPolicyId(initialSelection);
+        }
 
         const b = await getBillingByPolicyNumbers(policyNumbers, signal);
         
@@ -72,7 +85,7 @@ export default function BillingPage() {
       cancelled = true;
       controller.abort();
     };
-  }, [user?.email]);
+  }, [user?.email, searchParams]);
 
   const selectedPolicy = useMemo(() => {
     return policies.find(p => p.policyNumber === selectedPolicyId) || null;

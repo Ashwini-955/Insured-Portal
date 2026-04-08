@@ -117,7 +117,7 @@ export function PolicyCard({ policy, onViewDetails }: PolicyCardProps) {
       {/* Action Buttons */}
       <div className="grid grid-cols-3 gap-2 pt-4 border-t border-gray-100 mt-auto">
         <button
-          onClick={() => router.push('/claims')}
+          onClick={() => router.push(`/claims?policyId=${policy.policyNumber}`)}
           className="flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold h-10 rounded-lg transition-all duration-200 hover:shadow-md active:scale-95"
           title="File a new insurance claim"
         >
@@ -125,7 +125,7 @@ export function PolicyCard({ policy, onViewDetails }: PolicyCardProps) {
           <span>Claim</span>
         </button>
         <button
-          onClick={() => router.push('/billing')}
+          onClick={() => router.push(`/billing?policyId=${policy.policyNumber}`)}
           className="flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-10 rounded-lg transition-all duration-200 hover:shadow-md active:scale-95"
           title="Make a payment"
         >
