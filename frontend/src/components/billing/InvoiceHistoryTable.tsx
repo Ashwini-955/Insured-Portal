@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Download, FileText, ExternalLink } from 'lucide-react';
+import { Download, ExternalLink } from 'lucide-react';
 import { formatDate } from '@/utils/formatDate';
 import { formatCurrency } from '@/utils/formatCurrency';
 import type { Billing } from '@/types';
@@ -66,6 +66,14 @@ export default function InvoiceHistoryTable({ billing }: { billing: Billing | nu
     doc.save('invoice_history.pdf');
   };
 
+  const [visibleCount, setVisibleCount] = useState(5);
+  const totalRecords = billing.projectedStatements.length;
+  const visibleStatements = billing.projectedStatements.slice(0, visibleCount);
+
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + 5);
+  };
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mt-8">
       <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -89,7 +97,7 @@ export default function InvoiceHistoryTable({ billing }: { billing: Billing | nu
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {billing.projectedStatements.map((invoice, idx) => {
+            {visibleStatements.map((invoice, idx) => {
               // Creating a mock invoice ID for display since not immediately present in projectedStatements map
               const invoiceId = `INV-${new Date(invoice.statementDate || invoice.statementDueDate).getFullYear()}-${String(idx + 1).padStart(3, '0')}`;
               
@@ -124,9 +132,16 @@ export default function InvoiceHistoryTable({ billing }: { billing: Billing | nu
       
       {/* Load More Footer */}
       <div className="p-4 border-t border-gray-100 flex justify-end bg-gray-50/50">
-        <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 font-bold text-xs rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
-          Load More
-        </button>
+        {visibleCount < totalRecords ? (
+          <button 
+            onClick={handleLoadMore}
+            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 font-bold text-xs rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+          >
+            Load More
+          </button>
+        ) : (
+          <span className="text-gray-500 font-medium text-xs py-2">No more records to display</span>
+        )}
       </div>
     </div>
   );
