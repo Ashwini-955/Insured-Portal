@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getPoliciesByEmail, getClaimsByPolicyNumbers, getBillingByPolicyNumbers } from '@/lib/api';
 import type { Policy, Claim, Billing } from '@/types';
@@ -12,12 +13,21 @@ import { Loader2 } from 'lucide-react';
 
 export default function ClaimsPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [claims, setClaims] = useState<Claim[]>([]);
   const [billing, setBilling] = useState<Billing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPolicyId, setSelectedPolicyId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Set selected policy from URL query parameter if provided
+    const policyFromUrl = searchParams.get('policyId');
+    if (policyFromUrl) {
+      setSelectedPolicyId(policyFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -35,6 +45,12 @@ export default function ClaimsPage() {
         if (cancelled) return;
 
         setPolicies(p);
+        
+        // If policyId from URL wasn't set yet, don't override it
+        if (!selectedPolicyId && !searchParams.get('policyId')) {
+          // Default behavior: no selection
+        }
+        
         const policyNumbers = p.map((x) => x.policyNumber).filter(Boolean);
 
         if (policyNumbers.length === 0) {
@@ -65,7 +81,7 @@ export default function ClaimsPage() {
       cancelled = true;
       controller.abort();
     };
-  }, [user?.email]);
+  }, [user?.email, selectedPolicyId, searchParams]);
 
   const filteredClaims = useMemo(() => {
     if (!selectedPolicyId) return claims;
