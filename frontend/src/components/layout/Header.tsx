@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Bell, User, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { getNotifications, subscribeToNotifications } from '@/lib/notifications';
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -26,6 +27,18 @@ export function Header({ onToggleSidebar }: HeaderProps) {
     };
   }, []);
 
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const updateCount = () => {
+      const notifs = getNotifications();
+      setUnreadCount(notifs.filter(n => !n.isRead).length);
+    };
+    
+    updateCount();
+    return subscribeToNotifications(updateCount);
+  }, []);
+
   return (
     <header className="sticky top-0 h-14 border-b border-slate-200 bg-white flex items-center justify-between px-4 md:px-6 z-40">
       <button
@@ -39,8 +52,11 @@ export function Header({ onToggleSidebar }: HeaderProps) {
       </button>
       
       <div className="flex items-center gap-2 md:gap-4 ml-auto">
-        <Link href="/notifications" className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors" aria-label="Notifications">
+        <Link href="/notifications" className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors" aria-label="Notifications">
           <Bell className="w-5 h-5" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+          )}
         </Link>
         
         <div className="relative border-l border-slate-200 pl-2 md:pl-4" ref={dropdownRef}>

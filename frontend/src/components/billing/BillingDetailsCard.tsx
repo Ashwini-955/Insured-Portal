@@ -5,20 +5,18 @@ import { formatDate } from '@/utils/formatDate';
 import { useAuth } from '@/context/AuthContext';
 import { sendPaymentEmail } from '@/lib/api';
 import type { Billing } from '@/types';
+import { addNotification } from '@/lib/notifications';
 
 export default function BillingDetailsCard({ billing }: { billing: Billing | null }) {
   const { user } = useAuth();
   const [isSending, setIsSending] = useState(false);
   const [lastEmailSent, setLastEmailSent] = useState<string | null>(null);
 
+  // We can remove the old useEffect that reads lastPaymentEmail 
+  // since the notification page tracks history now.
+  // since the notification page tracks history now.
   useEffect(() => {
-    const stored = localStorage.getItem('lastPaymentEmail');
-    if (stored) {
-      const data = JSON.parse(stored);
-      if (data.policyNumber === billing?.PolicyNumber) {
-        setLastEmailSent(data.timestamp);
-      }
-    }
+    // legacy check can stay or be removed; we'll rely on the notification system
   }, [billing?.PolicyNumber]);
 
   if (!billing) return null;
@@ -55,8 +53,12 @@ export default function BillingDetailsCard({ billing }: { billing: Billing | nul
         amount: nextPaymentAmount,
       });
       const timestamp = new Date().toISOString();
-      localStorage.setItem('lastPaymentEmail', JSON.stringify({ policyNumber: billing.PolicyNumber, timestamp }));
-      window.dispatchEvent(new Event('notification-updated'));
+      addNotification({
+        type: 'payment',
+        title: 'Payment Confirmation Sent',
+        message: `A payment receipt email has been dispatched for Policy <span class="font-bold text-gray-800">${billing.PolicyNumber}</span>. Please check your inbox for the transaction details.`,
+        policyNumber: billing.PolicyNumber
+      });
       setLastEmailSent(timestamp);
       alert('Payment email sent successfully!');
     } catch (error) {

@@ -3,43 +3,24 @@
 import React, { useEffect, useState } from 'react';
 import { formatDate } from '@/utils/formatDate';
 import { Bell, Mail, FileCheck, Info } from 'lucide-react';
-
-interface LastEmail {
-  policyNumber: string;
-  timestamp: string;
-}
-
-interface LastClaim {
-  policyNumber: string;
-  claimNumber: string;
-  timestamp: string;
-}
+import { getNotifications, markAllAsRead, subscribeToNotifications, type AppNotification } from '@/lib/notifications';
 
 export default function NotificationsPage() {
-  const [lastEmail, setLastEmail] = useState<LastEmail | null>(null);
-  const [lastClaim, setLastClaim] = useState<LastClaim | null>(null);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
   useEffect(() => {
     const loadState = () => {
-      const storedEmail = localStorage.getItem('lastPaymentEmail');
-      if (storedEmail) {
-        setLastEmail(JSON.parse(storedEmail));
-      }
-      
-      const storedClaim = localStorage.getItem('lastClaimFiled');
-      if (storedClaim) {
-        setLastClaim(JSON.parse(storedClaim));
-      }
+      setNotifications(getNotifications());
     };
 
     loadState();
-    window.addEventListener('notification-updated', loadState);
-    window.addEventListener('storage', loadState);
+    
+    // Slight delay to mark reading to avoid flashing unread badge on instant click
+    const timer = setTimeout(() => {
+      markAllAsRead();
+    }, 500);
 
-    return () => {
-      window.removeEventListener('notification-updated', loadState);
-      window.removeEventListener('storage', loadState);
-    };
+    return subscribeToNotifications(loadState);
   }, []);
 
   return (
@@ -63,47 +44,26 @@ export default function NotificationsPage() {
         </div>
         
         <div className="divide-y divide-gray-100">
-          {!lastEmail && !lastClaim ? (
+          {notifications.length === 0 ? (
              <div className="px-6 py-12 text-center flex flex-col items-center">
                <Info className="w-10 h-10 text-gray-300 mb-3" />
                <p className="text-gray-500 font-medium text-sm">You have no new notifications.</p>
              </div>
           ) : (
-            <>
-              {lastClaim && (
-                <div className="px-6 py-5 hover:bg-slate-50 transition-colors flex items-start gap-4">
-                  <div className="mt-1 p-2 bg-emerald-50 rounded-full border border-emerald-100 flex-shrink-0">
-                    <FileCheck className="w-5 h-5 text-emerald-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-4 mb-1">
-                      <p className="text-sm font-bold text-gray-900">Claim Successfully Filed</p>
-                      <span className="text-xs font-semibold text-gray-400 whitespace-nowrap">{formatDate(lastClaim.timestamp)}</span>
-                    </div>
-                    <p className="text-sm text-gray-600 leading-relaxed font-medium">
-                      Your new claim <span className="font-bold text-gray-800">#{lastClaim.claimNumber}</span> has been processed for Policy <span className="font-bold text-gray-800">{lastClaim.policyNumber}</span>. We will review the details and get back to you shortly.
-                    </p>
-                  </div>
+            notifications.map((notif) => (
+              <div key={notif.id} className={`px-6 py-5 hover:bg-slate-50 transition-colors flex items-start gap-4 ${!notif.isRead ? 'bg-blue-50/30' : ''}`}>
+                <div className={`mt-1 p-2 rounded-full border flex-shrink-0 ${notif.type === 'claim' ? 'bg-emerald-50 border-emerald-100' : 'bg-blue-50 border-blue-100'}`}>
+                  {notif.type === 'claim' ? <FileCheck className="w-5 h-5 text-emerald-600" /> : <Mail className="w-5 h-5 text-blue-600" />}
                 </div>
-              )}
-
-              {lastEmail && (
-                <div className="px-6 py-5 hover:bg-slate-50 transition-colors flex items-start gap-4">
-                  <div className="mt-1 p-2 bg-blue-50 rounded-full border border-blue-100 flex-shrink-0">
-                    <Mail className="w-5 h-5 text-blue-600" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-4 mb-1">
+                    <p className="text-sm font-bold text-gray-900">{notif.title}</p>
+                    <span className="text-xs font-semibold text-gray-400 whitespace-nowrap">{formatDate(notif.timestamp)}</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-4 mb-1">
-                      <p className="text-sm font-bold text-gray-900">Payment Confirmation Sent</p>
-                      <span className="text-xs font-semibold text-gray-400 whitespace-nowrap">{formatDate(lastEmail.timestamp)}</span>
-                    </div>
-                    <p className="text-sm text-gray-600 leading-relaxed font-medium">
-                      A payment receipt email has been dispatched for Policy <span className="font-bold text-gray-800">{lastEmail.policyNumber}</span>. Please check your inbox for the transaction details.
-                    </p>
-                  </div>
+                  <p className="text-sm text-gray-600 leading-relaxed font-medium" dangerouslySetInnerHTML={{ __html: notif.message }}></p>
                 </div>
-              )}
-            </>
+              </div>
+            ))
           )}
         </div>
       </div>
