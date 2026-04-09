@@ -12,6 +12,7 @@ import SelectedPolicySummary from '@/components/billing/SelectedPolicySummary';
 import BillingDetailsCard from '@/components/billing/BillingDetailsCard';
 import AutoPayCard from '@/components/billing/AutoPayCard';
 import InvoiceHistoryTable from '@/components/billing/InvoiceHistoryTable';
+import BillingCharts from '@/components/billing/BillingCharts';
 
 export default function BillingPage() {
   const { user } = useAuth();
@@ -141,6 +142,8 @@ export default function BillingPage() {
             <BillingDetailsCard billing={selectedBilling} />
             <AutoPayCard billing={selectedBilling} />
           </div>
+
+          <BillingCharts billing={selectedBilling} />
 
           <InvoiceHistoryTable billing={selectedBilling} />
         </div>
