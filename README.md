@@ -3,7 +3,7 @@
 
 ### 1. Backend Setup
 
-#### Step 1 — Go to the backend folder
+#### Step 1 — Go to backend folder
 ```bash
 cd backend
 ```

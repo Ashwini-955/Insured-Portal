@@ -106,3 +106,19 @@ export async function createClaim(data: {
   if (!res.ok) throw new Error(result.message || 'Failed to create claim');
   return result.data;
 }
+
+export async function createClaimWithImages(formData: FormData): Promise<Claim> {
+  let res: Response;
+  try {
+    res = await fetch(`${config.api.baseUrl}/claims`, {
+      method: 'POST',
+      // Note: Let the browser set the Content-Type with FormData boundary automatically.
+      body: formData,
+    });
+  } catch {
+    throw new Error('Cannot reach server.');
+  }
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || 'Failed to create claim');
+  return result.data;
+}

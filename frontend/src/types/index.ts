@@ -39,6 +39,18 @@ export interface Claim {
   IncidentTime?: string;
   PaidLoss?: number;
   AccidentCode?: string;
+  CarrierName?: string;
+  MainAdjusterName?: string;
+  Phone?: string;
+  Email?: string;
+  ReserveDetails?: Array<{
+    LossRes?: number;
+    LossesPaid?: number;
+    AdjusterName?: string;
+    AdjusterPhone?: string;
+    AdjusterEmail?: string;
+  }>;
+  Images?: string[];
 }
 
 export interface Billing {

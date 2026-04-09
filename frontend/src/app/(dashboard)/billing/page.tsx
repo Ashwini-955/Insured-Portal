@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getPoliciesByEmail, getBillingByPolicyNumbers } from '@/lib/api';
 import type { Policy, Billing } from '@/types';
@@ -12,16 +13,28 @@ import BillingDetailsCard from '@/components/billing/BillingDetailsCard';
 import AutoPayCard from '@/components/billing/AutoPayCard';
 import InvoiceHistoryTable from '@/components/billing/InvoiceHistoryTable';
 import BillingCharts from '@/components/billing/BillingCharts';
+import InvoiceDetailsModal from '@/components/billing/InvoiceDetailsModal';
 
 export default function BillingPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [billings, setBillings] = useState<Billing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
   
   // By default, we select the first policy (handled after fetch)
   const [selectedPolicyId, setSelectedPolicyId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Set selected policy from URL query parameter if provided
+    const policyFromUrl = searchParams.get('policyId');
+    if (policyFromUrl) {
+      setSelectedPolicyId(policyFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -48,11 +61,14 @@ export default function BillingPage() {
           return;
         }
 
-        // Default to selecting the first active policy, or just the very first one
-        const initialSelection = p.find(val => val.status?.toLowerCase() === 'active')?.policyNumber 
+        // If policyId from URL was provided, use it; otherwise default to first active or first policy
+        const initialSelection = searchParams.get('policyId') 
+                              || p.find(val => val.status?.toLowerCase() === 'active')?.policyNumber 
                               || (p.length > 0 ? p[0].policyNumber : null);
         
-        setSelectedPolicyId(initialSelection);
+        if (initialSelection && !selectedPolicyId) {
+          setSelectedPolicyId(initialSelection);
+        }
 
         const b = await getBillingByPolicyNumbers(policyNumbers, signal);
         
@@ -73,7 +89,7 @@ export default function BillingPage() {
       cancelled = true;
       controller.abort();
     };
-  }, [user?.email]);
+  }, [user?.email, searchParams]);
 
   const selectedPolicy = useMemo(() => {
     return policies.find(p => p.policyNumber === selectedPolicyId) || null;
@@ -123,8 +139,7 @@ export default function BillingPage() {
 
       {selectedPolicyId ? (
         <div className="animate-in slide-in-from-bottom-4 duration-500">
-          <SelectedPolicySummary policy={selectedPolicy} />
-          
+          <SelectedPolicySummary policy={selectedPolicy} user={user} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <BillingDetailsCard billing={selectedBilling} />
             <AutoPayCard billing={selectedBilling} />
@@ -132,12 +147,24 @@ export default function BillingPage() {
 
           <BillingCharts billing={selectedBilling} />
 
-          <InvoiceHistoryTable billing={selectedBilling} />
+          <InvoiceHistoryTable
+            billing={selectedBilling}
+            onView={(invoice) => {
+              setSelectedInvoice(invoice);
+              setOpenModal(true);
+            }}
+          />
         </div>
       ) : (
         <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-8 text-center mt-8">
            <p className="text-blue-700 font-bold">Please select a policy to view billing details.</p>
         </div>
+      )}
+      {openModal && (
+        <InvoiceDetailsModal
+          invoice={selectedInvoice}
+          onClose={() => setOpenModal(false)}
+        />
       )}
     </div>
   );

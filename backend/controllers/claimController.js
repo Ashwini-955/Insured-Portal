@@ -1,6 +1,4 @@
 const Claim = require('../models/Claim');
-const fs = require('fs');
-const path = require('path');
 
 // GET /api/claims?policyNumbers=FPP1,FPP2,FPP3
 const getClaimsByPolicyNumbers = async (req, res) => {
@@ -12,8 +10,8 @@ const getClaimsByPolicyNumbers = async (req, res) => {
       return res.status(200).json({ success: true, count: 0, data: [] });
     }
 
-    const claimsData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/claims.json'), 'utf8'));
-    const claims = claimsData.filter(c => policyNumbers.includes(c.PolicyNumber));
+    const claims = await Claim.find({ PolicyNumber: { $in: policyNumbers } });
+
 
     res.status(200).json({
       success: true,
@@ -30,7 +28,11 @@ const getClaimsByPolicyNumbers = async (req, res) => {
 // POST /api/claims
 const createClaim = async (req, res) => {
   try {
-    const { policyNumber, incidentDate, incidentTime, location, description } = req.body;
+    // fields will be in req.body, files in req.files
+    const { policyNumber, incidentDate, incidentTime, location, description, accidentCode } = req.body;
+    
+    // Extract uploaded image URLs from multer 'req.files'
+    const imagePaths = req.files ? req.files.map(file => file.path) : [];
 
     if (!policyNumber || !incidentDate || !description) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
@@ -49,26 +51,15 @@ const createClaim = async (req, res) => {
       LossDate: incidentDate,
       ReceivedDate: new Date().toISOString().split('T')[0],
       DescriptionOfLoss: description,
+      AccidentCode: accidentCode,
       Location: location,
       IncidentTime: incidentTime,
       PaidLoss: 0,
-      ReserveDetails: []
+      ReserveDetails: [],
+      Images: imagePaths
     });
 
     await newClaim.save();
-
-    // Sync to claims.json
-    try {
-      const claimsFilePath = path.join(__dirname, '../data/claims.json');
-      if (fs.existsSync(claimsFilePath)) {
-        const claimsData = JSON.parse(fs.readFileSync(claimsFilePath, 'utf8'));
-        claimsData.push(newClaim.toObject());
-        fs.writeFileSync(claimsFilePath, JSON.stringify(claimsData, null, 2), 'utf8');
-      }
-    } catch (fsErr) {
-      console.error('Error syncing to claims.json:', fsErr);
-      // We still return 201 since DB save succeeded
-    }
 
     res.status(201).json({
       success: true,

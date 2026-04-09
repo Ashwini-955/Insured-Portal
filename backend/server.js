@@ -6,18 +6,20 @@ const connectDB = require('./config/db');
 
 // Load env from backend/.env (repo root may not contain .env)
 dotenv.config({ path: path.join(__dirname, '.env') });
-// connectDB(); // Bypassed for local JSON testing without MongoDB
+connectDB(); // Re-enabled connection to MongoDB
 const app = express();
 
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 //routes 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/policies', require('./routes/policyRoutes'));
 app.use('/api/claims',   require('./routes/claimRoutes'));
 app.use('/api/billing',  require('./routes/billingRoutes'));
+app.use('/api/ai',       require('./routes/aiRoutes'));
+
 
 app.get('/', (req, res) => {
   res.json({

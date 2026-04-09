@@ -1,4 +1,0 @@
-{
-  "stack": "TypeError: argument handler must be a function\n    at Route.<computed> [as get] (C:\\Insured_Portal\\backend\\node_modules\\router\\lib\\route.js:228:15)\n    at Router.<computed> [as get] (C:\\Insured_Portal\\backend\\node_modules\\router\\index.js:448:19)\n    at Object.<anonymous> (C:\\Insured_Portal\\backend\\routes\\policyRoutes.js:6:8)\n    at Module._compile (node:internal/modules/cjs/loader:1565:14)\n    at Object..js (node:internal/modules/cjs/loader:1708:10)\n    at Module.load (node:internal/modules/cjs/loader:1318:32)\n    at Function._load (node:internal/modules/cjs/loader:1128:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:219:24)\n    at Module.require (node:internal/modules/cjs/loader:1340:12)",
-  "message": "argument handler must be a function"
-}

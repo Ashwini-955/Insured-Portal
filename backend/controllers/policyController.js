@@ -1,7 +1,6 @@
 const Policy = require('../models/Policy');
+const User = require('../models/User');
 
-const fs = require('fs');
-const path = require('path');
 
 const getPoliciesByEmail = async (req, res) => {
   try {
@@ -10,32 +9,55 @@ const getPoliciesByEmail = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email is required' });
     }
 
-    const usersData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/users.json'), 'utf8'));
-    const user = usersData.find(u => u.email.toLowerCase() === email);
+    const matched = await Policy.find({ 'insured.email': new RegExp('^' + email + '$', 'i') }).lean();
 
-    if (!user || (!user.policyNumbers && !user.policy_numbers)) {
-      return res.status(404).json({
-        success: false,
-        message: 'No policies found for this email'
-      });
-    }
-    
-    const targetNumbers = user.policyNumbers || user.policy_numbers || [];
-
-    const policiesData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/policies.json'), 'utf8'));
-    const matched = policiesData.filter(p => targetNumbers.includes(p.PolicyNumber || p.policyNumber));
-
-    const transformedPolicies = matched.map(p => ({
-      policyNumber: p.PolicyNumber || p.policyNumber,
-      status: p.PolicyStatus || p.status || 'Active',
-      effectiveDate: p.EffectiveDate || p.effectiveDate,
-      expirationDate: p.ExpirationDate || p.expirationDate,
-      accountId: p.AccountId || p.accountId,
-      policyType: 'Insurance Policy',
-      insured: {
-        email: user.email
+    const transformedPolicies = matched.map(p => {
+      // Handle nested property address
+      let addr = p.propertyAddress;
+      if (!addr && p.ClientInformation?.BusinessInfo?.Locations?.[0]?.Address) {
+        const locAddr = p.ClientInformation.BusinessInfo.Locations[0].Address;
+        addr = {
+          addressLine1: locAddr.AddressLine1,
+          city: locAddr.City,
+          state: locAddr.State,
+          zipCode: locAddr.Zip || locAddr.ZipCode
+        };
       }
-    }));
+
+      // Handle nested coverages
+      let covs = p.coverages || [];
+      if ((!covs || covs.length === 0) && p.PolicyCoverages?.Coverages) {
+        covs = p.PolicyCoverages.Coverages.map(c => ({
+          name: c.Description,
+          limit: c.Limit
+        }));
+      }
+
+      // Determine policyType dynamically from coverages
+      const allCoveragesText = covs.map(c => (c.name || '').toLowerCase()).join(' ');
+      let derivedPolicyType = 'General Insurance';
+      if (allCoveragesText.includes('farm') || allCoveragesText.includes('livestock')) {
+        derivedPolicyType = 'Farm Insurance';
+      } else if (allCoveragesText.includes('auto') || allCoveragesText.includes('collision') || allCoveragesText.includes('motorist') || allCoveragesText.includes('bodily injury')) {
+        derivedPolicyType = 'Auto Insurance';
+      } else if (allCoveragesText.includes('dwelling') || allCoveragesText.includes('home')) {
+        derivedPolicyType = 'Home Insurance';
+      }
+
+      return {
+        policyNumber: p.PolicyNumber || p.policyNumber,
+        status: p.PolicyStatus || p.status || 'Active',
+        effectiveDate: p.EffectiveDate || p.effectiveDate,
+        expirationDate: p.ExpirationDate || p.expirationDate,
+        accountId: p.AccountId || p.accountId,
+        policyType: derivedPolicyType,
+        insured: {
+          email: p.insured?.email || email
+        },
+        propertyAddress: addr || null,
+        coverages: covs
+      };
+    });
 
     if (!transformedPolicies || transformedPolicies.length === 0) {
       return res.status(404).json({
