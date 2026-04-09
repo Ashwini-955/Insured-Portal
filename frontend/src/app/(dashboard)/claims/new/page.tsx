@@ -6,8 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 import { getPoliciesByEmail, createClaimWithImages, getClaimsByPolicyNumbers, getBillingByPolicyNumbers } from '@/lib/api';
 import type { Policy, Claim, Billing } from '@/types';
 import { ChevronLeft, FileText, Clock, CheckCircle2, Sparkles } from 'lucide-react';
-import { addNotification } from '@/lib/notifications';
 import { config } from '@/config/env';
+import { addNotification } from '@/lib/notifications';
 
 export default function NewClaimWizard() {
   const router = useRouter();
@@ -148,6 +148,7 @@ export default function NewClaimWizard() {
     try {
       setIsSubmitting(true);
       setError(null);
+      
       const fd = new FormData();
       fd.append('policyNumber', formData.policyNumber);
       fd.append('incidentDate', formData.incidentDate);
@@ -171,7 +172,7 @@ export default function NewClaimWizard() {
       addNotification({
         type: 'claim',
         title: 'New Claim Filed',
-        message: `Your claim (${formData.accidentCode}) for policy ${formData.policyNumber} was submitted successfully.`,
+        message: `Your claim (${newClaim.ClaimNumber || 'Pending'}) for policy ${formData.policyNumber} has been successfully submitted.`,
         policyNumber: formData.policyNumber,
         claimNumber: newClaim.ClaimNumber
       });
