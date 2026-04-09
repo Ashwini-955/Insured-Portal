@@ -20,6 +20,7 @@ app.use('/api/claims',   require('./routes/claimRoutes'));
 app.use('/api/billing',  require('./routes/billingRoutes'));
 app.use('/api/ai',       require('./routes/aiRoutes'));
 
+
 app.get('/', (req, res) => {
   res.json({
     message: 'Insured Portal API is running',

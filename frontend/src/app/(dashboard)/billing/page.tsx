@@ -13,6 +13,7 @@ import BillingDetailsCard from '@/components/billing/BillingDetailsCard';
 import AutoPayCard from '@/components/billing/AutoPayCard';
 import InvoiceHistoryTable from '@/components/billing/InvoiceHistoryTable';
 import BillingCharts from '@/components/billing/BillingCharts';
+import InvoiceDetailsModal from '@/components/billing/InvoiceDetailsModal';
 
 export default function BillingPage() {
   const { user } = useAuth();
@@ -21,6 +22,8 @@ export default function BillingPage() {
   const [billings, setBillings] = useState<Billing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
   
   // By default, we select the first policy (handled after fetch)
   const [selectedPolicyId, setSelectedPolicyId] = useState<string | null>(null);
@@ -136,21 +139,36 @@ export default function BillingPage() {
 
       {selectedPolicyId ? (
         <div className="animate-in slide-in-from-bottom-4 duration-500">
-          <SelectedPolicySummary policy={selectedPolicy} />
-          
+          <SelectedPolicySummary policy={selectedPolicy} user={user} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <BillingDetailsCard billing={selectedBilling} />
             <AutoPayCard billing={selectedBilling} />
           </div>
 
+<<<<<<< HEAD
           <BillingCharts billing={selectedBilling} />
 
           <InvoiceHistoryTable billing={selectedBilling} />
+=======
+          <InvoiceHistoryTable
+            billing={selectedBilling}
+            onView={(invoice) => {
+              setSelectedInvoice(invoice);
+              setOpenModal(true);
+            }}
+          />
+>>>>>>> origin/Gouri
         </div>
       ) : (
         <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-8 text-center mt-8">
            <p className="text-blue-700 font-bold">Please select a policy to view billing details.</p>
         </div>
+      )}
+      {openModal && (
+        <InvoiceDetailsModal
+          invoice={selectedInvoice}
+          onClose={() => setOpenModal(false)}
+        />
       )}
     </div>
   );
