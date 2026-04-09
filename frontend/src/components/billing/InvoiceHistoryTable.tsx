@@ -1,78 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Download, FileText, ExternalLink } from 'lucide-react';
+import { Download, ExternalLink } from 'lucide-react';
 import { formatDate } from '@/utils/formatDate';
 import { formatCurrency } from '@/utils/formatCurrency';
 import type { Billing } from '@/types';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-export default function InvoiceHistoryTable({ billing }: { billing: Billing | null }) {
-  if (!billing || !billing.projectedStatements || billing.projectedStatements.length === 0) {
-    return (
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center mt-8">
-        <p className="text-gray-500 font-medium">No invoice history found for this policy.</p>
-      </div>
-    );
-  }
+interface Props {
+  billing: Billing | null;
+  onView: (invoice: any) => void;
+}
 
-  const getStatusBadge = (status: string) => {
-    const s = status.toLowerCase();
-    if (s === 'paid') {
-      return <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-green-500 text-white uppercase tracking-wider">Paid</span>;
-    } else if (s === 'due') {
-      return <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-orange-500 text-white uppercase tracking-wider">Due</span>;
-    } else if (s === 'future') {
-      return <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-gray-200 text-gray-700 uppercase tracking-wider">Future</span>;
-    }
-    return <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-800 uppercase tracking-wider">{status}</span>;
-  };
-
-  const handleDownloadAll = () => {
-    if (!billing || !billing.projectedStatements || billing.projectedStatements.length === 0) return;
-
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text('Invoice History', 14, 22);
-
-    const tableColumn = ["Invoice ID", "Issue Date", "Due Date", "Amount", "Status"];
-    const tableRows: any[] = [];
-
-    billing.projectedStatements.forEach((invoice, idx) => {
-      const invoiceId = `INV-${new Date(invoice.statementDate || invoice.statementDueDate).getFullYear()}-${String(idx + 1).padStart(3, '0')}`;
-      const issueDate = invoice.statementDate ? formatDate(invoice.statementDate) : '-';
-      const dueDate = formatDate(invoice.statementDueDate);
-      const amount = formatCurrency(invoice.statementTotalAmountDue || 0);
-      const status = invoice.status;
-
-      tableRows.push([
-        invoiceId,
-        issueDate,
-        dueDate,
-        amount,
-        status
-      ]);
-    });
-
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 30,
-      theme: 'striped',
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [248, 250, 252], textColor: [100, 116, 139], fontStyle: 'bold' },
-    });
-
-    doc.save('invoice_history.pdf');
-  };
-
+export default function InvoiceHistoryTable({ billing, onView }: Props) {
   const [visibleCount, setVisibleCount] = useState(5);
-  const totalRecords = billing.projectedStatements.length;
-  const visibleStatements = billing.projectedStatements.slice(0, visibleCount);
 
-  const handleLoadMore = () => {
-    setVisibleCount(prev => prev + 5);
-  };
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [billing]);
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mt-8">
@@ -97,7 +42,7 @@ export default function InvoiceHistoryTable({ billing }: { billing: Billing | nu
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {visibleStatements.map((invoice, idx) => {
+            {billing.projectedStatements.slice(0, visibleCount).map((invoice, idx) => {
               // Creating a mock invoice ID for display since not immediately present in projectedStatements map
               const invoiceId = `INV-${new Date(invoice.statementDate || invoice.statementDueDate).getFullYear()}-${String(idx + 1).padStart(3, '0')}`;
               
@@ -132,15 +77,13 @@ export default function InvoiceHistoryTable({ billing }: { billing: Billing | nu
       
       {/* Load More Footer */}
       <div className="p-4 border-t border-gray-100 flex justify-end bg-gray-50/50">
-        {visibleCount < totalRecords ? (
-          <button 
-            onClick={handleLoadMore}
+        {billing.projectedStatements.length > visibleCount && (
+          <button
+            onClick={() => setVisibleCount((prev) => prev + 5)}
             className="px-4 py-2 bg-white border border-gray-300 text-gray-700 font-bold text-xs rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
           >
             Load More
           </button>
-        ) : (
-          <span className="text-gray-500 font-medium text-xs py-2">No more records to display</span>
         )}
       </div>
     </div>

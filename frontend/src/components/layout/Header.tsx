@@ -1,10 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { Bell, User, LogOut } from 'lucide-react';
-import Link from 'next/link';
-import { getNotifications, subscribeToNotifications } from '@/lib/notifications';
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { User } from "lucide-react";
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -12,35 +10,29 @@ interface HeaderProps {
 
 export function Header({ onToggleSidebar }: HeaderProps) {
   const { user, logout } = useAuth();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [openMenu, setOpenMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node)
+      ) {
+        setOpenMenu(false);
       }
     }
+
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    const updateCount = () => {
-      const notifs = getNotifications();
-      setUnreadCount(notifs.filter(n => !n.isRead).length);
-    };
-    
-    updateCount();
-    return subscribeToNotifications(updateCount);
-  }, []);
-
   return (
-    <header className="sticky top-0 h-14 border-b border-slate-200 bg-white flex items-center justify-between px-4 md:px-6 z-40">
+    <header className="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-4 md:px-6">
+      
+      {/* Sidebar toggle */}
       <button
         onClick={onToggleSidebar}
         className="md:hidden p-2 text-slate-600 hover:text-slate-900"
@@ -50,51 +42,57 @@ export function Header({ onToggleSidebar }: HeaderProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      
-      <div className="flex items-center gap-2 md:gap-4 ml-auto">
-        <Link href="/notifications" className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors" aria-label="Notifications">
-          <Bell className="w-5 h-5" />
-          {unreadCount > 0 && (
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-          )}
-        </Link>
+
+      {/* Right section */}
+      <div className="flex items-center gap-4 ml-auto">
         
-        <div className="relative border-l border-slate-200 pl-2 md:pl-4" ref={dropdownRef}>
-          <button 
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Profile menu"
+        {/* Search */}
+        <input
+          type="search"
+          placeholder="Search policies, claims, or documents"
+          className="w-[200px] sm:w-[280px] md:w-[360px] lg:w-[420px] px-4 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+        />
+
+        {/* Notification */}
+        <button className="p-2" aria-label="Notifications">🔔</button>
+
+        {/* User Menu */}
+        <div ref={menuRef} className="relative">
+          <button
+            onClick={() => setOpenMenu(!openMenu)}
+            className="p-2 rounded-lg hover:bg-gray-100 transition"
           >
-            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
-              {user?.firstName?.[0] || 'U'}
-            </div>
+            <User className="w-5 h-5 text-gray-700" />
           </button>
-          
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 py-2 transform opacity-100 scale-100 transition-all duration-200 origin-top-right">
-              <div className="px-4 py-3 border-b border-slate-100">
-                <p className="text-sm font-semibold text-slate-900 truncate">
-                  {user?.firstName} {user?.lastName}
+
+          {/* Dropdown */}
+          {openMenu && (
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border p-4 z-50 animate-in fade-in zoom-in-95">
+              
+              {/* User Info */}
+              <div className="mb-3">
+                <p className="text-sm font-semibold text-gray-900">
+                  {user?.email?.split("@")[0] || "User"}
                 </p>
-                <p className="text-xs text-slate-500 truncate mt-0.5">
-                  {user?.email}
+                <p className="text-xs text-gray-500">
+                  {user?.email || "user@email.com"}
                 </p>
               </div>
-              <div className="py-1">
-                <button
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    logout();
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign out
-                </button>
-              </div>
+
+              <hr className="my-2" />
+
+              {/* Logout */}
+              <button
+                onClick={logout}
+                className="w-full text-left text-sm text-red-600 hover:text-red-700"
+              >
+                Logout
+              </button>
             </div>
           )}
+
         </div>
+
       </div>
     </header>
   );
