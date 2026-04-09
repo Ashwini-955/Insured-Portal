@@ -1,4 +1,19 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Replicate = require('replicate');
+
+const CLAIM_DESCRIPTION_PROMPT =
+  'Write a concise (2-4 sentences), professional "Description of Loss" based on the image. Focus only on clearly visible damage and state observations factually without assumptions.';
+
+const normalizeOutput = (output) => {
+  if (Array.isArray(output)) {
+    return output.join(' ').trim();
+  }
+
+  if (typeof output === 'string') {
+    return output.trim();
+  }
+
+  return '';
+};
 
 const analyzeImages = async (req, res) => {
   try {
@@ -8,45 +23,40 @@ const analyzeImages = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No images provided' });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ success: false, message: 'GEMINI_API_KEY is not configured' });
+    if (!process.env.REPLICATE_API_TOKEN) {
+      return res.status(500).json({ success: false, message: 'REPLICATE_API_TOKEN is not configured' });
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    // Use the Gemini 2.5 Flash model for fast multimodal tasks
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-    const prompt = `You are an expert claims adjuster. Analyze these images and write a brief, professional description of the incident/damage for an insurance claim 'Description of Loss' field. 
-    Make it concise (2-4 sentences max). Focus purely on observable damage. Do not mention that you cannot be certain, just state what appears to be damaged in a factual tone.`;
-
-    const imageParts = images.map(img => {
-      // The frontend will send Data URIs like "data:image/jpeg;base64,...base64string..."
-      // We need to parse the mimeType and the base64 data.
-      let mimeType = 'image/jpeg';
-      let data = img;
-      
-      const match = img.match(/^data:([^;]+);base64,(.+)$/);
-      if (match) {
-        mimeType = match[1];
-        data = match[2];
-      }
-
-      return {
-        inlineData: {
-          data,
-          mimeType
-        }
-      };
+    const replicate = new Replicate({
+      auth: process.env.REPLICATE_API_TOKEN,
     });
 
-    const result = await model.generateContent([prompt, ...imageParts]);
-    const response = await result.response;
-    const text = response.text();
+    const output = await replicate.run(
+      'yorickvp/llava-13b:80537f9eead1a5bfa72d5ac6c6baa33118e2d18e453aa0f4923f62a52b69e8c9',
+      {
+        input: {
+          image: images[0],
+          prompt: CLAIM_DESCRIPTION_PROMPT,
+        },
+      }
+    );
 
-    res.status(200).json({ success: true, description: text });
+    const description = normalizeOutput(output);
+
+    if (!description) {
+      return res.status(502).json({
+        success: false,
+        message: 'Replicate returned an empty description',
+      });
+    }
+
+    return res.status(200).json({ success: true, description });
   } catch (error) {
     console.error('AI Error:', error);
-    res.status(500).json({ success: false, message: error.message || 'Failed to generate AI description' });
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to generate AI description',
+    });
   }
 };
 

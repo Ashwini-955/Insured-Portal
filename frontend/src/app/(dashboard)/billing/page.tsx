@@ -145,11 +145,8 @@ export default function BillingPage() {
             <AutoPayCard billing={selectedBilling} />
           </div>
 
-<<<<<<< HEAD
           <BillingCharts billing={selectedBilling} />
 
-          <InvoiceHistoryTable billing={selectedBilling} />
-=======
           <InvoiceHistoryTable
             billing={selectedBilling}
             onView={(invoice) => {
@@ -157,7 +154,6 @@ export default function BillingPage() {
               setOpenModal(true);
             }}
           />
->>>>>>> origin/Gouri
         </div>
       ) : (
         <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-8 text-center mt-8">

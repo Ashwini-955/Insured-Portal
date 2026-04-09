@@ -19,6 +19,44 @@ export default function InvoiceHistoryTable({ billing, onView }: Props) {
     setVisibleCount(5);
   }, [billing]);
 
+  const handleDownloadAll = () => {
+    if (!billing || !billing.projectedStatements) return;
+
+    const doc = new jsPDF();
+    const tableData = billing.projectedStatements.map((invoice, idx) => {
+      const invoiceId = `INV-${new Date(invoice.statementDate || invoice.statementDueDate).getFullYear()}-${String(idx + 1).padStart(3, '0')}`;
+      return [
+        invoiceId,
+        invoice.statementDate ? formatDate(invoice.statementDate) : '-',
+        formatDate(invoice.statementDueDate),
+        formatCurrency(invoice.statementTotalAmountDue || 0),
+        invoice.status || 'Pending',
+      ];
+    });
+
+    autoTable(doc, {
+      head: [['Invoice ID', 'Issue Date', 'Due Date', 'Amount', 'Status']],
+      body: tableData,
+    });
+
+    doc.save('invoices.pdf');
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusColor: Record<string, string> = {
+      'Paid': 'bg-green-100 text-green-700',
+      'Pending': 'bg-yellow-100 text-yellow-700',
+      'Overdue': 'bg-red-100 text-red-700',
+    };
+
+    const color = statusColor[status] || 'bg-gray-100 text-gray-700';
+    return (
+      <span className={`px-3 py-1 rounded-full text-xs font-medium ${color}`}>
+        {status}
+      </span>
+    );
+  };
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mt-8">
       <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
