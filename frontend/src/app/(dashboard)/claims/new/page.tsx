@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getPoliciesByEmail, createClaim, getClaimsByPolicyNumbers, getBillingByPolicyNumbers } from '@/lib/api';
 import type { Policy, Claim, Billing } from '@/types';
 import { ChevronLeft, FileText, Clock, CheckCircle2 } from 'lucide-react';
+import { addNotification } from '@/lib/notifications';
 
 export default function NewClaimWizard() {
   const router = useRouter();
@@ -96,13 +97,29 @@ export default function NewClaimWizard() {
     try {
       setIsSubmitting(true);
       setError(null);
-      await createClaim({
+      const newClaim = await createClaim({
         policyNumber: formData.policyNumber,
         incidentDate: formData.incidentDate,
         incidentTime: formData.incidentTime,
         location: formData.location,
         description: formData.description
       });
+
+      // Store info for the notification page
+      localStorage.setItem('lastClaimFiled', JSON.stringify({
+        policyNumber: formData.policyNumber,
+        claimNumber: newClaim.ClaimNumber,
+        timestamp: new Date().toISOString()
+      }));
+
+      addNotification({
+        type: 'claim',
+        title: 'New Claim Filed',
+        message: `Your claim for policy ${formData.policyNumber} was submitted successfully.`,
+        policyNumber: formData.policyNumber,
+        claimNumber: newClaim.ClaimNumber
+      });
+
       // Skip to a success step or redirect out
       router.push('/claims');
     } catch (err) {
