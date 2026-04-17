@@ -25,6 +25,11 @@ export interface Policy {
     name?: string;
     limit?: number;
   }>;
+  agent?: {
+    name: string;
+    phone: string;
+    email: string;
+  };
 }
 
 export interface Claim {

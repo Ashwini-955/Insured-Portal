@@ -1,7 +1,8 @@
 'use client';
 
 import { Policy } from '@/types';
-import { X, FileText, Calendar, MapPin, Shield, Edit2 } from 'lucide-react';
+import { X, FileText, Calendar, MapPin, Shield, Edit2, Mail, User, Phone } from 'lucide-react';
+import { addNotification } from '@/lib/notifications';
 
 interface PolicyDetailsModalProps {
   readonly policy: Policy | null;
@@ -46,6 +47,20 @@ export function PolicyDetailsModal({ policy, onClose }: PolicyDetailsModalProps)
   };
 
   const statusBadgeClasses = getStatusBadgeClasses(policy.status || '');
+
+  const handleAgentEmailClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+
+    if (!policy.agent?.email) return;
+
+    addNotification({
+      type: 'agent',
+      title: 'Agent Email Sent',
+      message: `Email sent to your assigned agent <span class="font-bold text-gray-800">${policy.agent.name}</span> for policy <span class="font-bold text-gray-800">${policy.policyNumber}</span>.`,
+      policyNumber: policy.policyNumber,
+    });
+    alert('Email sent successfully!');
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
@@ -95,6 +110,60 @@ export function PolicyDetailsModal({ policy, onClose }: PolicyDetailsModalProps)
               </div>
             </div>
           </section>
+
+          {/* Assigned Agent Section */}
+          {policy.agent && (
+            <section className="bg-gradient-to-br from-blue-50/30 to-white rounded-2xl border border-blue-100 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2">
+                <User size={20} className="text-blue-600" />
+                Assigned Agent
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Contact Information</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-white rounded-lg border border-gray-100 shadow-sm text-blue-600">
+                        <User size={18} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">{policy.agent.name}</p>
+                        <p className="text-xs text-gray-500">Professional Insurance Agent</p>
+                      </div>
+                    </div>
+                    {policy.agent.phone && (
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white rounded-lg border border-gray-100 shadow-sm text-emerald-600">
+                          <Phone size={18} />
+                        </div>
+                        <p className="text-sm font-medium text-gray-700">{policy.agent.phone}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col justify-end">
+                  {policy.agent.email && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 bg-white rounded-lg border border-gray-100 shadow-sm text-blue-600">
+                          <Mail size={18} />
+                        </div>
+                        <p className="text-sm font-medium text-gray-700">{policy.agent.email}</p>
+                      </div>
+                      <a 
+                        href={`mailto:${policy.agent.email}`}
+                        onClick={handleAgentEmailClick}
+                        className="w-full flex items-center justify-center gap-2 bg-white hover:bg-blue-50 text-blue-600 border border-blue-200 font-bold py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
+                      >
+                        <Mail size={16} />
+                        Send Direct Email
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* Coverage Period */}
           <section>

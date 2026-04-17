@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { Policy } from '@/types';
-import { FileText, Eye, DollarSign, Calendar, MapPin, Shield, FileCheck } from 'lucide-react';
+import { FileText, Eye, DollarSign, Calendar, MapPin, Shield, FileCheck, Mail, User, Phone } from 'lucide-react';
+import { addNotification } from '@/lib/notifications';
 
 interface PolicyCardProps {
   readonly policy: Policy;
@@ -51,6 +52,20 @@ export function PolicyCard({ policy, onViewDetails }: PolicyCardProps) {
   const cityState = address
     ? `${address.city}, ${address.state} ${address.zipCode}`
     : '';
+
+  const handleAgentEmailClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+
+    if (!policy.agent?.email) return;
+
+    addNotification({
+      type: 'agent',
+      title: 'Agent Email Sent',
+      message: `Email sent to your assigned agent <span class="font-bold text-gray-800">${policy.agent.name}</span> for policy <span class="font-bold text-gray-800">${policy.policyNumber}</span>.`,
+      policyNumber: policy.policyNumber,
+    });
+    alert('Email sent successfully!');
+  };
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col h-full">
@@ -111,6 +126,43 @@ export function PolicyCard({ policy, onViewDetails }: PolicyCardProps) {
           {policy.coverages.length > 2 && (
             <p className="text-xs text-gray-400 mt-1.5">+ {policy.coverages.length - 2} more coverage(s)</p>
           )}
+        </div>
+      )}
+
+      {/* Agent Info */}
+      {policy.agent && (
+        <div className="mb-4 p-3 bg-blue-50/50 border border-blue-100/50 rounded-lg">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-2 min-w-0">
+              <User className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1">Assigned Agent</p>
+                <p className="text-sm font-bold text-gray-900 leading-tight mb-1">{policy.agent.name}</p>
+                {policy.agent.phone && (
+                  <p className="flex items-center gap-1.5 text-xs font-medium text-gray-700 leading-tight mb-1">
+                    <Phone className="w-3 h-3 text-emerald-600 flex-shrink-0" />
+                    <span>{policy.agent.phone}</span>
+                  </p>
+                )}
+                {policy.agent.email && (
+                  <p className="flex items-center gap-1.5 text-xs font-medium text-gray-700 leading-tight min-w-0">
+                    <Mail className="w-3 h-3 text-blue-600 flex-shrink-0" />
+                    <span className="min-w-0 flex-1 truncate" title={policy.agent.email}>{policy.agent.email}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+            {policy.agent.email && (
+              <a 
+                href={`mailto:${policy.agent.email}`}
+                onClick={handleAgentEmailClick}
+                className="p-2 rounded-full bg-white text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm border border-blue-100"
+                title={`Email agent: ${policy.agent.name}`}
+              >
+                <Mail className="w-4 h-4" />
+              </a>
+            )}
+          </div>
         </div>
       )}
 

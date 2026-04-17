@@ -1,6 +1,18 @@
 const Policy = require('../models/Policy');
 const User = require('../models/User');
+const fallbackPolicies = require('../data/policies.json');
 
+const getCommunicationValue = (communications = [], typeAliases = []) => {
+  if (!Array.isArray(communications)) return '';
+
+  const aliases = typeAliases.map(alias => alias.toLowerCase());
+  const match = communications.find(item => {
+    const itemType = (item.Type || item.type || '').toLowerCase();
+    return aliases.includes(itemType);
+  });
+
+  return match?.Value || match?.value || '';
+};
 
 const getPoliciesByEmail = async (req, res) => {
   try {
@@ -12,6 +24,9 @@ const getPoliciesByEmail = async (req, res) => {
     const matched = await Policy.find({ 'insured.email': new RegExp('^' + email + '$', 'i') }).lean();
 
     const transformedPolicies = matched.map(p => {
+      const policyNumber = p.PolicyNumber || p.policyNumber;
+      const fallbackPolicy = fallbackPolicies.find(item => (item.PolicyNumber || item.policyNumber) === policyNumber);
+
       // Handle nested property address
       let addr = p.propertyAddress;
       if (!addr && p.ClientInformation?.BusinessInfo?.Locations?.[0]?.Address) {
@@ -44,8 +59,24 @@ const getPoliciesByEmail = async (req, res) => {
         derivedPolicyType = 'Home Insurance';
       }
 
+      // Extract agent information. Data may come from raw JSON (Agent/Communications)
+      // or Mongo documents shaped by the schema (agent/communications).
+      const rawAgent = p.Agent || p.agent || fallbackPolicy?.Agent || fallbackPolicy?.agent;
+      let transformedAgent = null;
+      if (rawAgent) {
+        const communications = rawAgent.Communications || rawAgent.communications || [];
+        const emailComm = rawAgent.Email || rawAgent.email || getCommunicationValue(communications, ['Email']);
+        const phoneComm = rawAgent.Phone || rawAgent.phone || getCommunicationValue(communications, ['PhNo', 'Phone', 'PhoneNumber']);
+
+        transformedAgent = {
+          name: rawAgent.Name || rawAgent.name || rawAgent.AgentName || rawAgent.agentName || 'N/A',
+          email: emailComm,
+          phone: phoneComm
+        };
+      }
+
       return {
-        policyNumber: p.PolicyNumber || p.policyNumber,
+        policyNumber,
         status: p.PolicyStatus || p.status || 'Active',
         effectiveDate: p.EffectiveDate || p.effectiveDate,
         expirationDate: p.ExpirationDate || p.expirationDate,
@@ -55,7 +86,8 @@ const getPoliciesByEmail = async (req, res) => {
           email: p.insured?.email || email
         },
         propertyAddress: addr || null,
-        coverages: covs
+        coverages: covs,
+        agent: transformedAgent
       };
     });
 

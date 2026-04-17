@@ -7,6 +7,7 @@ import { getPoliciesByEmail, createClaimWithImages, getClaimsByPolicyNumbers, ge
 import type { Policy, Claim, Billing } from '@/types';
 import { ChevronLeft, FileText, Clock, CheckCircle2, Sparkles } from 'lucide-react';
 import { config } from '@/config/env';
+import { addNotification } from '@/lib/notifications';
 
 export default function NewClaimWizard() {
   const router = useRouter();
@@ -161,12 +162,13 @@ export default function NewClaimWizard() {
       
       const newClaim = await createClaimWithImages(fd);
       
-      // Store info for the notification page
-      localStorage.setItem('lastClaimFiled', JSON.stringify({
+      addNotification({
+        type: 'claim',
+        title: 'Claim Submitted',
+        message: `Your claim <span class="font-bold text-gray-800">${newClaim.ClaimNumber}</span> for Policy <span class="font-bold text-gray-800">${formData.policyNumber}</span> has been submitted successfully and is now pending review.`,
         policyNumber: formData.policyNumber,
         claimNumber: newClaim.ClaimNumber,
-        timestamp: new Date().toISOString()
-      }));
+      });
 
       setIsSuccess(true);
     } catch (err) {

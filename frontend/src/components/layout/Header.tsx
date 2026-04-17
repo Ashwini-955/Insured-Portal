@@ -46,13 +46,6 @@ export function Header({ onToggleSidebar }: HeaderProps) {
       {/* Right section */}
       <div className="flex items-center gap-4 ml-auto">
         
-        {/* Search */}
-        <input
-          type="search"
-          placeholder="Search policies, claims, or documents"
-          className="w-[200px] sm:w-[280px] md:w-[360px] lg:w-[420px] px-4 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
-        />
-
         {/* Notification */}
         <button className="p-2" aria-label="Notifications">🔔</button>
 

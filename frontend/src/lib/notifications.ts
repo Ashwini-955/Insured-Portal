@@ -1,4 +1,4 @@
-export type NotificationType = 'payment' | 'claim';
+export type NotificationType = 'payment' | 'claim' | 'agent';
 
 export interface AppNotification {
   id: string;
@@ -20,7 +20,7 @@ export function getNotifications(): AppNotification[] {
   if (!stored) return [];
   try {
     return JSON.parse(stored) as AppNotification[];
-  } catch (e) {
+  } catch {
     return [];
   }
 }
