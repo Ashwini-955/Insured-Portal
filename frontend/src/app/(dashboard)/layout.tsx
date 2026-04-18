@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
+import { Chatbot } from '@/components/chatbot/Chatbot';
 
 export default function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -42,6 +43,7 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
         <Header onToggleSidebar={toggleSidebar} />
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
+      <Chatbot />
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
