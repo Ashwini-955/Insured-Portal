@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { User } from "lucide-react";
+import { Bell, User } from "lucide-react";
+import Link from "next/link";
+import { getNotifications, subscribeToNotifications } from "@/lib/notifications";
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -11,6 +13,7 @@ interface HeaderProps {
 export function Header({ onToggleSidebar }: HeaderProps) {
   const { user, logout } = useAuth();
   const [openMenu, setOpenMenu] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -29,6 +32,17 @@ export function Header({ onToggleSidebar }: HeaderProps) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const updateUnreadCount = () => {
+      const notifications = getNotifications();
+      setUnreadCount(notifications.filter((notification) => !notification.isRead).length);
+    };
+
+    updateUnreadCount();
+    return subscribeToNotifications(updateUnreadCount);
+  }, []);
+
   return (
     <header className="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-4 md:px-6">
       
@@ -47,7 +61,16 @@ export function Header({ onToggleSidebar }: HeaderProps) {
       <div className="flex items-center gap-4 ml-auto">
         
         {/* Notification */}
-        <button className="p-2" aria-label="Notifications">🔔</button>
+        <Link
+          href="/notifications"
+          className="relative p-2 rounded-lg hover:bg-gray-100 transition text-gray-700"
+          aria-label="Notifications"
+        >
+          <Bell className="w-5 h-5" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
+          )}
+        </Link>
 
         {/* User Menu */}
         <div ref={menuRef} className="relative">
