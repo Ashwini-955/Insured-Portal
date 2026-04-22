@@ -72,31 +72,86 @@ export function ClaimDetailsModal({ claim, onClose }: ClaimDetailsModalProps) {
             </span>
           </div>
 
-          {/* Timeline */}
-          <section className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-            <h3 className="text-sm font-bold text-gray-900 mb-6 uppercase tracking-wider flex justify-center">Claim Timeline</h3>
-            <div className="flex items-center justify-center max-w-lg mx-auto">
-              {/* Step 1: Pending */}
-              <div className={`flex flex-col items-center flex-1 justify-center ${statusLower === 'rejected' || statusLower === 'denied' ? 'text-gray-400' : 'text-blue-600'}`}>
-                 <FileText className="w-6 h-6 mb-2" />
-                 <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-center">Pending</span>
-              </div>
-              <div className={`h-1 w-12 sm:w-16 rounded-full mx-2 sm:mx-4 mb-5 ${statusLower === 'rejected' || statusLower === 'denied' ? 'bg-gray-200' : 'bg-blue-600'}`} />
-              
-              {/* Step 2: Under Review (Active) */}
-              <div className={`flex flex-col items-center flex-1 justify-center ${['active', 'approved', 'closed'].includes(statusLower) ? 'text-blue-600' : 'text-gray-400'}`}>
-                 <Clock className="w-6 h-6 mb-2" />
-                 <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-center">Under Review</span>
-              </div>
-              <div className={`h-1 w-12 sm:w-16 rounded-full mx-2 sm:mx-4 mb-5 ${['approved', 'closed'].includes(statusLower) ? 'bg-blue-600' : 'bg-gray-200'}`} />
-
-              {/* Step 3: Approved / Denied */}
-              <div className={`flex flex-col items-center flex-1 justify-center ${['approved', 'closed', 'rejected', 'denied'].includes(statusLower) ? (['rejected', 'denied'].includes(statusLower) ? 'text-red-500' : 'text-green-500') : 'text-gray-400'}`}>
-                 <CheckCircle2 className="w-6 h-6 mb-2" />
-                 <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-center">
-                    {['rejected', 'denied'].includes(statusLower) ? 'Denied' : 'Approved'}
-                 </span>
-              </div>
+          {/* Enhanced Claim Tracking Timeline */}
+          <section className="bg-gray-50 rounded-xl p-6 md:p-8 border border-gray-200">
+            <h3 className="text-sm font-bold text-gray-900 mb-6 uppercase tracking-wider flex items-center gap-2">
+              <Clock size={18} className="text-blue-600" />
+              Live Tracking Status
+            </h3>
+            <div className="relative border-l-2 border-gray-200 ml-4 md:ml-6 mt-4 space-y-8">
+              {[
+                {
+                  key: 'submitted',
+                  title: 'Claim Submitted',
+                  icon: FileText,
+                  completed: true,
+                  date: claim.ReceivedDate || claim.LossDate,
+                  description: 'We have received your claim details.'
+                },
+                {
+                  key: 'adjuster',
+                  title: 'Adjuster Assigned',
+                  icon: User,
+                  completed: !!claim.MainAdjusterName,
+                  date: claim.MainAdjusterName ? 'Assigned' : 'Pending',
+                  description: claim.MainAdjusterName ? `Assigned to ${claim.MainAdjusterName}` : 'Waiting for assignment.'
+                },
+                {
+                  key: 'review',
+                  title: 'Under Review',
+                  icon: Clock,
+                  completed: ['active', 'approved', 'closed'].includes(statusLower) || !!claim.MainAdjusterName,
+                  date: '',
+                  description: 'Adjuster is reviewing the damage and evidence.'
+                },
+                {
+                  key: 'estimate',
+                  title: 'Estimate Prepared',
+                  icon: ShieldAlert,
+                  completed: Boolean(claim.ReserveDetails && claim.ReserveDetails.length > 0) || ['approved', 'closed'].includes(statusLower),
+                  date: '',
+                  description: 'Repair estimate and reserve limits calculated.'
+                },
+                {
+                  key: 'resolved',
+                  title: statusLower === 'rejected' || statusLower === 'denied' ? 'Claim Denied' : (claim.PaidLoss ? 'Payment Issued' : 'Resolution'),
+                  icon: statusLower === 'rejected' || statusLower === 'denied' ? X : CheckCircle2,
+                  completed: ['approved', 'closed', 'rejected', 'denied'].includes(statusLower),
+                  date: '',
+                  description: statusLower === 'rejected' || statusLower === 'denied' ? 'Coverage was unfortunately denied.' : (claim.PaidLoss ? 'Funds have been delivered for repairs.' : 'Awaiting final coverage decision.')
+                }
+              ].map((stage, i, arr) => {
+                const isLast = i === arr.length - 1;
+                const isStatusRejected = statusLower === 'rejected' || statusLower === 'denied';
+                const nodeColor = stage.completed 
+                                   ? (isLast && isStatusRejected ? 'bg-red-500' : 'bg-blue-600') 
+                                   : 'bg-gray-200';
+                
+                return (
+                  <div key={stage.key} className="relative pl-8 md:pl-10">
+                    {/* Node */}
+                    <span className={`absolute -left-[17px] top-0 flex items-center justify-center w-8 h-8 rounded-full border-4 border-gray-50 ${nodeColor} shadow-sm z-10 transition-colors duration-500`}>
+                       <stage.icon className={`w-3.5 h-3.5 ${stage.completed ? 'text-white' : 'text-gray-400'}`} />
+                    </span>
+                    {/* Content */}
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start -mt-1">
+                       <div>
+                          <h4 className={`text-base font-bold ${stage.completed ? (isLast && isStatusRejected ? 'text-red-700' : 'text-gray-900') : 'text-gray-400'}`}>
+                            {stage.title}
+                          </h4>
+                          <p className={`text-sm mt-1 max-w-sm ${stage.completed ? 'text-gray-600' : 'text-gray-400'}`}>
+                            {stage.description}
+                          </p>
+                       </div>
+                       {stage.date && (
+                          <span className={`text-xs font-semibold mt-2 sm:mt-0 sm:ml-4 whitespace-nowrap bg-white px-2.5 py-1 rounded-md border ${stage.completed ? 'border-gray-200 text-gray-600' : 'border-gray-100 text-gray-400'}`}>
+                             {stage.date.includes('-') ? formatDate(stage.date) : stage.date}
+                          </span>
+                       )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
 
