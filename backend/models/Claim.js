@@ -14,7 +14,8 @@ const claimSchema = new mongoose.Schema({
   Email: { type: String },
   Location: { type: String },
   IncidentTime: { type: String },
-  ReserveDetails: { type: Array }
+  ReserveDetails: { type: Array },
+  Images: { type: [String], default: [] }
 });
 
 module.exports = mongoose.model('Claim', claimSchema);

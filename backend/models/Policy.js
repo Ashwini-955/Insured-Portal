@@ -21,6 +21,13 @@ const policySchema = new mongoose.Schema({
     name: { type: String },
     limit: { type: Number }
   }],
+  agent: {
+    name: { type: String },
+    communications: [{
+      type: { type: String },
+      value: { type: String }
+    }]
+  },
   documents: { type: Array },
   transactionHistory: { type: Array }
 }, { timestamps: true });

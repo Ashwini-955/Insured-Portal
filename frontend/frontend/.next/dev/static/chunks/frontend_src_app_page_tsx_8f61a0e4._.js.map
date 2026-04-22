@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Insured_Portal/frontend/src/app/page.tsx"],"sourcesContent":["'use client';\r\n\r\nimport { useEffect } from 'react';\r\nimport { useRouter } from 'next/navigation';\r\n\r\nexport default function Home() {\r\n  const router = useRouter();\r\n\r\n  useEffect(() => {\r\n    router.replace('/dashboard');\r\n  }, [router]);\r\n\r\n  return (\r\n    <div className=\"min-h-screen flex items-center justify-center\">\r\n      <p>Redirecting...</p>\r\n    </div>\r\n  );\r\n}"],"names":[],"mappings":";;;;;AAEA;AACA;;;AAHA;;;AAKe,SAAS;;IACtB,MAAM,SAAS,IAAA,8JAAS;IAExB,IAAA,sLAAS;0BAAC;YACR,OAAO,OAAO,CAAC;QACjB;yBAAG;QAAC;KAAO;IAEX,qBACE,yMAAC;QAAI,WAAU;kBACb,cAAA,yMAAC;sBAAE;;;;;;;;;;;AAGT;GAZwB;;QACP,8JAAS;;;KADF"}}]
+}

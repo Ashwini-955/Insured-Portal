@@ -16,7 +16,10 @@ export function PendingClaimsCard({
   isLoading?: boolean;
   error?: string | null;
 }) {
-  const pending = useMemo(() => (claims ?? []).filter((c) => PENDING.includes(c.Status ?? '')), [claims]);
+  const pending = useMemo(() => (claims ?? [])
+    .filter((c) => PENDING.includes(c.Status ?? ''))
+    .sort((a, b) => new Date(b.ReceivedDate || b.LossDate || 0).getTime() - new Date(a.ReceivedDate || a.LossDate || 0).getTime()),
+    [claims]);
   return (
     <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 sm:p-5 min-h-[220px] flex flex-col">
       <div className="flex items-center justify-between mb-3">
@@ -34,7 +37,9 @@ export function PendingClaimsCard({
           {pending.slice(0, 3).map((c) => (
             <li key={c.ClaimNumber} className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm font-medium text-slate-900 truncate">{c.AccidentCode || c.ClaimNumber}</p>
+                <p className="text-sm font-medium text-slate-900 truncate" title={c.AccidentCode || c.DescriptionOfLoss || c.ClaimNumber}>
+                  {c.AccidentCode || c.DescriptionOfLoss || c.ClaimNumber}
+                </p>
                 <p className="text-[11px] text-slate-500 mt-1">Filed: {formatDate(c.ReceivedDate)}</p>
               </div>
               <span className="shrink-0 text-[11px] px-2 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 uppercase tracking-wider font-medium">

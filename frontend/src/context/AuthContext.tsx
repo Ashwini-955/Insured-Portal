@@ -32,20 +32,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loadFromStorage = useCallback(() => {
     if (typeof window === 'undefined') return;
+    
+    // We will bypass the login and automatically log in with a sample user for now
+    const dummyUser = { email: 'nsingh@cogitate.us', firstName: 'Navin', lastName: 'Singh' };
+    const dummyToken = 'mock-token';
+
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const data = JSON.parse(stored);
         setState({
-          user: data.user, token: data.token,
-          isLoading: false, isAuthenticated: !!data.token,
+          user: data.user || dummyUser, 
+          token: data.token || dummyToken,
+          isLoading: false, 
+          isAuthenticated: true,
         });
         return;
       }
     } catch {
       localStorage.removeItem(STORAGE_KEY);
     }
-    setState((s) => ({ ...s, isLoading: false }));
+    
+    // Fallback if no user is found
+    setState({ user: dummyUser, token: dummyToken, isLoading: false, isAuthenticated: true });
   }, []);
 
   useEffect(() => { loadFromStorage(); }, [loadFromStorage]);

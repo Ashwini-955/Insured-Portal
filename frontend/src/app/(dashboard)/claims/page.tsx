@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getPoliciesByEmail, getClaimsByPolicyNumbers, getBillingByPolicyNumbers } from '@/lib/api';
 import type { Policy, Claim, Billing } from '@/types';
@@ -12,12 +13,21 @@ import { Loader2 } from 'lucide-react';
 
 export default function ClaimsPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [claims, setClaims] = useState<Claim[]>([]);
   const [billing, setBilling] = useState<Billing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPolicyId, setSelectedPolicyId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Set selected policy from URL query parameter if provided
+    const policyFromUrl = searchParams.get('policyId');
+    if (policyFromUrl) {
+      setSelectedPolicyId(policyFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -35,6 +45,12 @@ export default function ClaimsPage() {
         if (cancelled) return;
 
         setPolicies(p);
+        
+        // If policyId from URL wasn't set yet, don't override it
+        if (!selectedPolicyId && !searchParams.get('policyId')) {
+          // Default behavior: no selection
+        }
+        
         const policyNumbers = p.map((x) => x.policyNumber).filter(Boolean);
 
         if (policyNumbers.length === 0) {
@@ -65,7 +81,7 @@ export default function ClaimsPage() {
       cancelled = true;
       controller.abort();
     };
-  }, [user?.email]);
+  }, [user?.email, selectedPolicyId, searchParams]);
 
   const filteredClaims = useMemo(() => {
     if (!selectedPolicyId) return claims;
@@ -74,7 +90,7 @@ export default function ClaimsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8 flex items-center justify-center min-h-[50vh]">
+      <div className="flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center space-y-4 text-gray-500">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
           <p className="font-medium">Loading your claims...</p>
@@ -85,7 +101,7 @@ export default function ClaimsPage() {
 
   if (error) {
     return (
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-xl shadow-sm">
           <h2 className="text-lg font-bold">Error</h2>
           <p className="font-medium mt-1">{error}</p>
@@ -95,13 +111,13 @@ export default function ClaimsPage() {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Claims Overview</h1>
+    <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 animate-in fade-in duration-500">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">Claims Overview</h1>
         {selectedPolicyId && (
           <button 
             onClick={() => setSelectedPolicyId(null)}
-            className="text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors w-fit"
+            className="text-xs md:text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors w-fit"
           >
             Clear Filter
           </button>

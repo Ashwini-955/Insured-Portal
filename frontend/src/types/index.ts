@@ -25,6 +25,11 @@ export interface Policy {
     name?: string;
     limit?: number;
   }>;
+  agent?: {
+    name: string;
+    phone: string;
+    email: string;
+  };
 }
 
 export interface Claim {
@@ -39,14 +44,45 @@ export interface Claim {
   IncidentTime?: string;
   PaidLoss?: number;
   AccidentCode?: string;
+  CarrierName?: string;
+  MainAdjusterName?: string;
+  Phone?: string;
+  Email?: string;
+  ReserveDetails?: Array<{
+    LossRes?: number;
+    LossesPaid?: number;
+    AdjusterName?: string;
+    AdjusterPhone?: string;
+    AdjusterEmail?: string;
+  }>;
+  Images?: string[];
 }
 
 export interface Billing {
   _id?: string;
   PolicyNumber: string;
+  payPlanDesc?: string;
+  isRecurringPayment?: boolean;
+  accountTotalBalance?: number;
   currentAmountDue?: number;
   currentDueDate?: string;
-  projectedStatements?: Array<{ status: string; statementDueDate: string; statementTotalAmountDue?: number }>;
+  projectedStatements?: Array<{ 
+    status: string; 
+    policy?: string;
+    statementDate?: string;
+    statementDueDate: string; 
+    statementTotalAmountDue?: number;
+    statementDurationPaid?: number;
+  }>;
+}
+
+export interface Invoice {
+  status: string; 
+  policy?: string;
+  statementDate?: string;
+  statementDueDate: string; 
+  statementTotalAmountDue?: number;
+  statementDurationPaid?: number;
 }
 
 export interface LoginResponse {

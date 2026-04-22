@@ -2,24 +2,19 @@
   {
     "PolicyNumber": "FPP2000002139-00",
     "AccountId": "ACC-001",
-    "PolicyStatus": "Policy Cancelled",
-    "EffectiveDate": "2025-11-11",
-    "ExpirationDate": "2026-11-11",
+    "PolicyStatus": "Active",
+    "EffectiveDate": "2024-11-11",
+    "ExpirationDate": "2025-11-11",
     "Transaction": {
-      "Type": "Cancellation",
-      "Date": "2026-02-18",
-      "Reason": "Non Payment"
+      "Type": "Renewal",
+      "Date": "2024-11-11",
+      "Reason": ""
     },
     "TransactionHistory": [
       {
         "Type": "Renewal",
-        "Date": "2026-02-13",
-        "AnnualPremium": 10749.5
-      },
-      {
-        "Type": "Cancellation",
-        "Date": "2026-02-18",
-        "AnnualPremium": 10749.5
+        "Date": "2024-11-11",
+        "AnnualPremium": 1500.5
       }
     ],
     "ClientInformation": {
@@ -62,19 +57,43 @@
       ]
     },
     "Carrier": {
-      "Name": "Sierra Specialty Insurance Company"
+      "Name": "SafeHome Mutual Insurance"
     },
     "PolicyCoverages": {
       "Coverages": [
         {
-          "Description": "Farm Employer's Liability",
+          "Description": "Dwelling Coverage",
+          "Limit": 250000,
+          "Deductible": 1000,
+          "IsSelected": true
+        },
+        {
+          "Description": "Other Structures Coverage",
+          "Limit": 25000,
+          "Deductible": 500,
+          "IsSelected": true
+        },
+        {
+          "Description": "Personal Property Coverage",
+          "Limit": 125000,
+          "Deductible": 1000,
+          "IsSelected": true
+        },
+        {
+          "Description": "Loss of Use Coverage",
           "Limit": 50000,
           "Deductible": 0,
           "IsSelected": true
         },
         {
-          "Description": "Farm Services for Hire Limited Liability",
-          "Limit": 50000,
+          "Description": "Personal Liability Coverage",
+          "Limit": 300000,
+          "Deductible": 0,
+          "IsSelected": true
+        },
+        {
+          "Description": "Medical Payments Coverage",
+          "Limit": 5000,
           "Deductible": 0,
           "IsSelected": true
         }
@@ -82,7 +101,7 @@
     },
     "Forms": [
       {
-        "FormName": "Cancellation Summary",
+        "FormName": "Policy Declarations",
         "FormType": "DynamicDocx"
       }
     ]
@@ -90,18 +109,23 @@
   {
     "PolicyNumber": "FPP1900008896-00",
     "AccountId": "ACC-001",
-    "PolicyStatus": "Active",
+    "PolicyStatus": "Policy Cancelled",
     "EffectiveDate": "2024-10-01",
     "ExpirationDate": "2025-10-01",
     "Transaction": {
-      "Type": "New Business",
-      "Date": "2024-10-01",
-      "Reason": ""
+      "Type": "Cancellation",
+      "Date": "2025-02-18",
+      "Reason": "Non Payment"
     },
     "TransactionHistory": [
       {
         "Type": "New Business",
         "Date": "2024-10-01",
+        "AnnualPremium": 8650.75
+      },
+      {
+        "Type": "Cancellation",
+        "Date": "2025-02-18",
         "AnnualPremium": 8650.75
       }
     ],
@@ -150,15 +174,39 @@
     "PolicyCoverages": {
       "Coverages": [
         {
-          "Description": "House Property Coverage",
+          "Description": "Farm Dwelling Coverage",
+          "Limit": 150000,
+          "Deductible": 2000,
+          "IsSelected": true
+        },
+        {
+          "Description": "Farm Outbuildings and Structures",
+          "Limit": 75000,
+          "Deductible": 1000,
+          "IsSelected": true
+        },
+        {
+          "Description": "Farm Personal Property",
           "Limit": 100000,
           "Deductible": 1000,
           "IsSelected": true
         },
         {
           "Description": "Livestock Coverage",
-          "Limit": 25000,
+          "Limit": 50000,
           "Deductible": 500,
+          "IsSelected": true
+        },
+        {
+          "Description": "Farm Employer's Liability",
+          "Limit": 50000,
+          "Deductible": 0,
+          "IsSelected": true
+        },
+        {
+          "Description": "Farm Services for Hire Limited Liability",
+          "Limit": 50000,
+          "Deductible": 0,
           "IsSelected": true
         }
       ]
@@ -177,19 +225,19 @@
   {
     "PolicyNumber": "FPP2025001234-00",
     "AccountId": "ACC-001",
-    "PolicyStatus": "Pending",
-    "EffectiveDate": "2026-05-01",
-    "ExpirationDate": "2027-05-01",
+    "PolicyStatus": "Active",
+    "EffectiveDate": "2024-05-01",
+    "ExpirationDate": "2025-05-01",
     "Transaction": {
       "Type": "New Business",
-      "Date": "2026-03-23",
+      "Date": "2024-03-23",
       "Reason": ""
     },
     "TransactionHistory": [
       {
         "Type": "New Business",
-        "Date": "2026-03-23",
-        "AnnualPremium": 12500.00
+        "Date": "2024-03-23",
+        "AnnualPremium": 2150.00
       }
     ],
     "ClientInformation": {
@@ -232,14 +280,44 @@
       ]
     },
     "Carrier": {
-      "Name": "Commercial Standard Insurance"
+      "Name": "AutoGuard Insurance Group"
     },
     "PolicyCoverages": {
       "Coverages": [
         {
-          "Description": "Commercial General Liability",
-          "Limit": 2000000,
-          "Deductible": 5000,
+          "Description": "Bodily Injury Liability",
+          "Limit": 100000,
+          "Deductible": 0,
+          "IsSelected": true
+        },
+        {
+          "Description": "Property Damage Liability",
+          "Limit": 50000,
+          "Deductible": 0,
+          "IsSelected": true
+        },
+        {
+          "Description": "Collision Coverage",
+          "Limit": 30000,
+          "Deductible": 500,
+          "IsSelected": true
+        },
+        {
+          "Description": "Comprehensive Coverage",
+          "Limit": 30000,
+          "Deductible": 500,
+          "IsSelected": true
+        },
+        {
+          "Description": "Uninsured Motorist Coverage",
+          "Limit": 50000,
+          "Deductible": 0,
+          "IsSelected": true
+        },
+        {
+          "Description": "Medical Payments Coverage",
+          "Limit": 5000,
+          "Deductible": 0,
           "IsSelected": true
         }
       ]

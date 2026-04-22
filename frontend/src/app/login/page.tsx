@@ -35,13 +35,13 @@ export default function LoginPage() {
         <p className="text-slate-600 text-center mb-6">Sign in with your policy email</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Email</label>
+            <label className="block text-sm font-medium mb-2 text-black">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="nsingh@cogitate.us"
-              className="w-full px-4 py-3 border rounded-lg"
+              className="w-full px-4 py-3 border rounded-lg text-black placeholder:text-gray-700"
               required
               disabled={isLoading}
             />
