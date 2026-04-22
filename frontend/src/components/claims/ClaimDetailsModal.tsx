@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Claim } from '@/types';
-import { X, FileText, Calendar, MapPin, Clock, CheckCircle2, ShieldAlert, User, Phone, Mail, Image as ImageIcon } from 'lucide-react';
+import { X, FileText, Calendar, MapPin, Clock, CheckCircle2, ShieldAlert, User, Phone, Mail, Image as ImageIcon, PieChart } from 'lucide-react';
 import { formatDate } from '@/utils/formatDate';
 import { formatCurrency } from '@/utils/formatCurrency';
 
@@ -38,7 +38,7 @@ export function ClaimDetailsModal({ claim, onClose }: ClaimDetailsModalProps) {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-white border-b border-gray-200 px-8 py-6 flex justify-between items-center z-10">
+        <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-white border-b border-gray-200 px-8 py-6 flex justify-between items-center z-30 shadow-sm">
           <div className="flex items-center gap-3">
             <ShieldAlert size={28} className="text-blue-600" />
             <h2 className="text-xl md:text-2xl font-bold text-gray-900">Claim Details</h2>
@@ -200,19 +200,76 @@ export function ClaimDetailsModal({ claim, onClose }: ClaimDetailsModalProps) {
           {/* Financials Section */}
           <section>
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <MapPin size={20} className="text-blue-600" />
-              Financial Assessment
+              <PieChart size={20} className="text-blue-600" />
+              Financial Breakdown
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Paid Loss Amount</p>
-                <p className="text-2xl font-bold text-green-600">{formatCurrency(claim.PaidLoss || 0)}</p>
-              </div>
-              <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Estimated Reserve</p>
-                <p className="text-2xl font-bold text-blue-600">{formatCurrency(claim.ReserveDetails?.[0]?.LossRes || claim.PaidLoss || 0)}</p>
-              </div>
-            </div>
+            {(() => {
+              const paidAmount = claim.PaidLoss || 0;
+              const reserveAmount = claim.ReserveDetails?.[0]?.LossRes || 0;
+              const totalAmount = paidAmount + reserveAmount;
+              
+              const paidPercentage = totalAmount > 0 ? Math.round((paidAmount / totalAmount) * 100) : 0;
+              const reservePercentage = totalAmount > 0 ? 100 - paidPercentage : 0;
+              
+              if (totalAmount === 0 && !claim.ReserveDetails?.length) {
+                return (
+                  <div className="bg-gray-50 rounded-xl p-8 border border-gray-200 text-center">
+                    <p className="text-gray-500 font-medium">No financial tracking data available yet.</p>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative overflow-hidden">
+                  <div className="grid grid-cols-2 gap-4 mb-5">
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block shadow-sm"></span>
+                        Paid Out
+                      </p>
+                      <p className="text-2xl font-bold text-gray-900">{formatCurrency(paidAmount)}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 flex items-center justify-end gap-1.5">
+                         <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block shadow-sm"></span>
+                         Remaining Reserve
+                      </p>
+                      <p className="text-2xl font-bold text-gray-900">{formatCurrency(reserveAmount)}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Progress Bar Container */}
+                  <div className="relative pt-2">
+                    <div className="flex mb-2 items-center justify-between">
+                      <div>
+                        <span className={`text-xs font-bold inline-block ${paidPercentage > 0 ? 'text-green-600' : 'text-gray-400'}`}>
+                          {paidPercentage}% Paid
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className={`text-xs font-bold inline-block ${reservePercentage > 0 ? 'text-blue-600' : 'text-gray-400'}`}>
+                          {reservePercentage}% Reserved
+                        </span>
+                      </div>
+                    </div>
+                    <div className="overflow-hidden h-3 sm:h-4 mb-4 text-xs flex rounded-full bg-gray-100 shadow-inner">
+                      <div 
+                        style={{ width: `${paidPercentage}%` }} 
+                        className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-1000 ease-out"
+                      ></div>
+                      <div 
+                        style={{ width: `${reservePercentage}%` }} 
+                        className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500 bg-gradient-to-r from-blue-600 to-blue-400 transition-all duration-1000 ease-out"
+                      ></div>
+                    </div>
+                    <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between items-center">
+                       <span className="text-sm font-semibold text-gray-600">Total Estimated Claim Cost</span>
+                       <span className="text-sm font-bold text-gray-900 bg-gray-50 px-3 py-1 rounded-lg border border-gray-200">{formatCurrency(totalAmount)}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </section>
 
           {/* Additional Details Grid */}
