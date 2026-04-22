@@ -1,5 +1,6 @@
 import React from 'react';
 import { Home, Car, Building2, Shield } from 'lucide-react';
+import { getPolicyTypeInfo } from '@/utils/policyUtils';
 import type { Policy } from '@/types';
 
 export default function PolicySelector({ 
@@ -13,18 +14,13 @@ export default function PolicySelector({
 }) {
   // Map policy data to UI format
   const mappedPolicies = policies.map((p) => {
-    // Guess icon based on description
-    const type = (p.policyType || '').toLowerCase();
-    let icon = Shield;
-    if (type.includes('home') || type.includes('property')) icon = Home;
-    else if (type.includes('auto') || type.includes('vehicle')) icon = Car;
-    else if (type.includes('commercial') || type.includes('business') || type.includes('farm')) icon = Building2;
+    const { title, icon } = getPolicyTypeInfo(p);
 
     const isActive = (p.status || '').toLowerCase() === 'active';
 
     return {
       id: p.policyNumber,
-      type: p.policyType || 'Insurance Policy',
+      type: title,
       status: p.status || 'Unknown',
       icon,
       active: isActive

@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getPoliciesByEmail, createClaim, getClaimsByPolicyNumbers, getBillingByPolicyNumbers } from '@/lib/api';
 import type { Policy, Claim, Billing } from '@/types';
 import { ChevronLeft, FileText, Clock, CheckCircle2 } from 'lucide-react';
+import { getPolicyTypeInfo } from '@/utils/policyUtils';
 
 export default function NewClaimWizard() {
   const router = useRouter();
@@ -164,11 +165,14 @@ export default function NewClaimWizard() {
                     disabled={isLoading}
                   >
                     <option value="" disabled>Select Policy...</option>
-                    {policies.map(p => (
-                      <option key={p.policyNumber} value={p.policyNumber}>
-                        {p.policyNumber} ({p.policyType || 'Policy'})
-                      </option>
-                    ))}
+                    {policies.map(p => {
+                      const { title } = getPolicyTypeInfo(p);
+                      return (
+                        <option key={p.policyNumber} value={p.policyNumber}>
+                          {p.policyNumber} ({title})
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
                 

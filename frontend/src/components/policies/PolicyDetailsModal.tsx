@@ -2,6 +2,7 @@
 
 import { Policy } from '@/types';
 import { X } from 'lucide-react';
+import { getPolicyTypeInfo } from '@/utils/policyUtils';
 
 interface PolicyDetailsModalProps {
   policy: Policy | null;
@@ -25,6 +26,8 @@ export function PolicyDetailsModal({ policy, onClose }: PolicyDetailsModalProps)
   const addressStr = address
     ? `${address.addressLine1}, ${address.city}, ${address.state} ${address.zipCode}`
     : 'No address available';
+
+  const { title } = getPolicyTypeInfo(policy);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -52,7 +55,7 @@ export function PolicyDetailsModal({ policy, onClose }: PolicyDetailsModalProps)
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Policy Type:</span>
-                <span className="font-semibold text-gray-900">{policy.policyType || 'N/A'}</span>
+                <span className="font-semibold text-gray-900">{title}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Status:</span>
