@@ -1,5 +1,5 @@
 'use client';
-
+//claims page is similar to dashboard but focused on claims data, with policy selector and claims table
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
