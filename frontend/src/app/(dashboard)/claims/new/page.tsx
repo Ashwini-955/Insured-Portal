@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getPoliciesByEmail, createClaimWithImages, getClaimsByPolicyNumbers, getBillingByPolicyNumbers } from '@/lib/api';
 import type { Policy, Claim, Billing } from '@/types';
-import { ChevronLeft, FileText, Clock, CheckCircle2, Sparkles } from 'lucide-react';
+import { ChevronLeft, FileText, Clock, CheckCircle2, Sparkles, AlertTriangle } from 'lucide-react';
 import { config } from '@/config/env';
 import { addNotification } from '@/lib/notifications';
 
@@ -22,6 +22,7 @@ export default function NewClaimWizard() {
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCoverages, setShowCoverages] = useState(false);
 
   const [formData, setFormData] = useState({
     policyNumber: '',
@@ -182,6 +183,40 @@ export default function NewClaimWizard() {
     }
   };
 
+  const isPotentialCoverageMismatch = (() => {
+    const selectedPolicy = policies.find(p => p.policyNumber === formData.policyNumber);
+    if (!selectedPolicy) return false;
+
+    const coveragesText = (selectedPolicy.coverages || []).map(c => c.name).join(' ').toLowerCase();
+    const pType = (selectedPolicy.policyType || '').toLowerCase();
+    
+    let coveredTopics = '';
+    if (pType.includes('auto') || coveragesText.includes('auto') || coveragesText.includes('collision') || coveragesText.includes('motorist')) coveredTopics += ' auto ';
+    if (pType.includes('home') || coveragesText.includes('dwelling') || coveragesText.includes('property')) coveredTopics += ' home ';
+    if (pType.includes('farm') || coveragesText.includes('livestock') || coveragesText.includes('tractor') || coveragesText.includes('barn')) coveredTopics += ' farm ';
+
+    const textToAnalyze = `${formData.accidentCode} ${formData.description}`.toLowerCase();
+    if (!textToAnalyze.trim()) return false;
+
+    const autoRegex = /\b(car|auto|vehicle|truck|motorcycle|collision|driving|bumper|fender|tire|windshield|crash|road|intersection)\b/i;
+    const homeRegex = /\b(roof|plumbing|leak|house|home|kitchen|basement|furniture|burst pipe|burglary|fence|dwelling)\b/i;
+    const farmRegex = /\b(tractor|livestock|cattle|cow|barn|crop|silo|field|machinery)\b/i;
+
+    const isAutoIncident = autoRegex.test(textToAnalyze);
+    const isHomeIncident = homeRegex.test(textToAnalyze);
+    const isFarmIncident = farmRegex.test(textToAnalyze);
+
+    // Mismatched domains
+    if (isAutoIncident && !isHomeIncident && !isFarmIncident && !coveredTopics.includes('auto')) return true;
+    if (isHomeIncident && !isAutoIncident && !isFarmIncident && !coveredTopics.includes('home')) return true;
+    if (isFarmIncident && !isAutoIncident && !isHomeIncident && !coveredTopics.includes('farm')) return true;
+
+    // Specific coverage gaps (e.g. they describe a collision but have no collision coverage)
+    if (isAutoIncident && coveredTopics.includes('auto') && /\b(collision|crash)\b/.test(textToAnalyze) && !coveragesText.includes('collision')) return true;
+
+    return false;
+  })();
+
   if (isSuccess) {
     return (
       <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in duration-500 flex flex-col items-center justify-center min-h-[60vh]">
@@ -232,6 +267,52 @@ export default function NewClaimWizard() {
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-medium">
               {error}
+            </div>
+          )}
+
+          {isPotentialCoverageMismatch && (
+            <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-4 rounded-xl text-sm flex flex-col gap-3 animate-in fade-in">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-bold text-amber-900 mb-1">Potential Claim Mismatch</h3>
+                  <p>
+                    This claim may not be suitable for this policy, but you may still file the claim.
+                  </p>
+                </div>
+              </div>
+              <div className="ml-8 flex items-center gap-2">
+                <button 
+                  type="button"
+                  onClick={() => setShowCoverages(!showCoverages)}
+                  className="text-xs font-semibold bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1.5 rounded-lg transition-colors border border-amber-300 shadow-sm"
+                >
+                  {showCoverages ? 'Hide Policy Coverages' : 'View Policy Coverages'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/support')}
+                  className="text-xs font-semibold bg-white hover:bg-gray-50 text-gray-700 px-3 py-1.5 rounded-lg transition-colors border border-gray-200 shadow-sm"
+                >
+                  Raise Query
+                </button>
+              </div>
+              {showCoverages && (
+                <div className="mt-2 ml-8 bg-white rounded-lg border border-amber-200 p-4 shadow-sm animate-in fade-in slide-in-from-top-2">
+                  <h4 className="font-bold text-sm text-gray-900 mb-3">Coverages for {formData.policyNumber}</h4>
+                  <ul className="space-y-2">
+                    {policies.find(p => p.policyNumber === formData.policyNumber)?.coverages?.map((c, i) => (
+                      <li key={i} className="text-sm flex justify-between items-center border-b border-gray-50 pb-2 last:border-0 last:pb-0">
+                        <span className="text-gray-700">{c.name}</span>
+                        <span className="font-semibold text-gray-900">${c.limit?.toLocaleString()}</span>
+                      </li>
+                    ))}
+                    {!policies.find(p => p.policyNumber === formData.policyNumber)?.coverages?.length && (
+                      <li className="text-sm text-gray-500">No coverage details found.</li>
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 
