@@ -6,7 +6,6 @@ const connectDB = require('./config/db');
 
 // Load env from backend/.env (repo root may not contain .env)
 dotenv.config({ path: path.join(__dirname, '.env') });
-connectDB(); // Re-enabled connection to MongoDB
 const app = express();
 
 app.use(cors());
@@ -46,6 +45,16 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to connect to database. Server not started.', error);
+    process.exit(1);
+  }
+};
+
+startServer();

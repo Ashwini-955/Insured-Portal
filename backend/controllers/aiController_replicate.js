@@ -21,9 +21,9 @@ const analyzeImages = async (req, res) => {
     // Process the first image
     const imageUrl = images[0];
 
-    // Using LLaVA model for image analysis - free and effective
+    // Using MiniGPT-4 for image analysis - free and effective
     const output = await replicate.run(
-      "yorickvp/llava-13b:80537f9eead1a5bfa72d5ac6c6baa33118e2d18e453aa0f4923f62a52b69e8c9",
+      "daanelson/minigpt-4-b2:3551af4ad4d9ae0e6c929b5f6c86a4e7b5e1b3b2",
       {
         input: {
           image: imageUrl,

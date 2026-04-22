@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { analyzeImages } = require('../controllers/aiController');
+const { analyzeImages } = require('../controllers/aiController_replicate');
 
 router.post('/analyze-images', analyzeImages);
 

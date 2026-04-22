@@ -101,10 +101,31 @@ export default function BillingPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8 flex items-center justify-center min-h-[50vh]">
-        <div className="flex flex-col items-center space-y-4 text-gray-500">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          <p className="font-medium">Evaluating your account balance...</p>
+      <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8 h-full">
+        {/* Header Skeleton */}
+        <div>
+          <div className="h-10 bg-gray-200 rounded-md w-1/3 mb-4 animate-pulse"></div>
+          <div className="h-5 bg-gray-200 rounded-md w-1/2 animate-pulse"></div>
+        </div>
+
+        {/* Policy Selector Skeleton */}
+        <div className="h-16 bg-gray-200 rounded-xl w-full animate-pulse shadow-sm border border-gray-100"></div>
+
+        <div className="space-y-8 animate-pulse">
+          {/* Selected Policy Summary Skeleton */}
+          <div className="h-28 bg-gray-200 rounded-xl w-full border border-gray-100 shadow-sm"></div>
+
+          {/* Cards Skeleton Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="h-64 bg-gray-200 rounded-xl w-full border border-gray-100 shadow-sm"></div>
+            <div className="h-64 bg-gray-200 rounded-xl w-full border border-gray-100 shadow-sm"></div>
+          </div>
+
+          {/* Charts Skeleton */}
+          <div className="h-96 bg-gray-200 rounded-xl w-full border border-gray-100 shadow-sm"></div>
+
+          {/* Table Skeleton */}
+          <div className="h-80 bg-gray-200 rounded-xl w-full border border-gray-100 shadow-sm"></div>
         </div>
       </div>
     );
