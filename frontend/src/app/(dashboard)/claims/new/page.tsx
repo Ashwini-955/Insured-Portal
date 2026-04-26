@@ -416,7 +416,7 @@ export default function NewClaimWizard() {
                   <ul className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {images.map((img, i) => (
                       <li key={i} className="text-xs flex items-center bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg">
-                        <span className="truncate flex-1">{img.name}</span>
+                        <span className="truncate flex-1 text-black font-medium">{img.name}</span>
                       </li>
                     ))}
                   </ul>

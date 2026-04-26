@@ -16,7 +16,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'insured-portal-secret-key';
 
 const login = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email } = req.body || {};
 
     if (!email || typeof email !== 'string') {
       return res.status(400).json({
@@ -28,7 +28,7 @@ const login = async (req, res) => {
     const unescapedEmail = email.trim().toLowerCase();
 
     const user = await User.findOne({ email: new RegExp('^' + unescapedEmail + '$', 'i') });
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,

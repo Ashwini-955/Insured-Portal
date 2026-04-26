@@ -1,0 +1,227 @@
+{
+	"info": {
+		"_postman_id": "insured-portal-dashboard",
+		"name": "Insured Portal Dashboard APIs",
+		"description": "Complete collection for testing Insured Portal Dashboard APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login with Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john.doe@example.com\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/auth/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Login with email to get user data and authentication token"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for the portal"
+		},
+		{
+			"name": "Dashboard Data Flow",
+			"item": [
+				{
+					"name": "Step 1: Get Policies by Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/policies/email/john.doe@example.com",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "policies", "email", "john.doe@example.com"]
+						},
+						"description": "Get all policies for a specific user email - This is the first step in dashboard data loading"
+					},
+					"response": []
+				},
+				{
+					"name": "Step 2: Get Claims by Policy Numbers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/claims?policyNumbers=POL-001,POL-002,POL-003",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "claims"],
+							"query": [
+								{
+									"key": "policyNumbers",
+									"value": "POL-001,POL-002,POL-003",
+									"description": "Comma-separated policy numbers from Step 1"
+								}
+							]
+						},
+						"description": "Get claims for specific policy numbers - Use policy numbers returned from Step 1"
+					},
+					"response": []
+				},
+				{
+					"name": "Step 3: Get Billing by Policy Numbers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/billing?policyNumbers=POL-001,POL-002,POL-003",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "billing"],
+							"query": [
+								{
+									"key": "policyNumbers",
+									"value": "POL-001,POL-002,POL-003",
+									"description": "Comma-separated policy numbers from Step 1"
+								}
+							]
+						},
+						"description": "Get billing information for specific policy numbers - Use same policy numbers from Step 1"
+					},
+					"response": []
+				}
+			],
+			"description": "Complete dashboard data loading sequence - Follow these steps in order"
+		},
+		{
+			"name": "Additional Features",
+			"item": [
+				{
+					"name": "Create New Claim",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"policyNumber\": \"POL-001\",\n    \"incidentDate\": \"2024-01-15\",\n    \"incidentTime\": \"14:30\",\n    \"location\": \"Main Street, City\",\n    \"description\": \"Car accident at intersection\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/claims",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "claims"]
+						},
+						"description": "Create a new insurance claim"
+					},
+					"response": []
+				},
+				{
+					"name": "Send Payment Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"policyNumber\": \"POL-001\",\n    \"email\": \"john.doe@example.com\",\n    \"amount\": 250.00\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/billing/send-payment-email",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "billing", "send-payment-email"]
+						},
+						"description": "Send payment reminder email to user"
+					},
+					"response": []
+				}
+			],
+			"description": "Additional functionality endpoints"
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "API Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000"
+						},
+						"description": "Check if the API server is running"
+					},
+					"response": []
+				}
+			],
+			"description": "Server health and status checks"
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "userEmail",
+			"value": "john.doe@example.com",
+			"type": "string"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global pre-request script",
+					"console.log('Executing pre-request script for: ' + pm.info.requestName);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test script",
+					"pm.test('Response time is less than 2000ms', function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+					"});",
+					"",
+					"pm.test('Response has proper JSON structure', function () {",
+					"    const jsonData = pm.response.json();",
+					"    pm.expect(jsonData).to.be.an('object');",
+					"});"
+				]
+			}
+		}
+	]
+}

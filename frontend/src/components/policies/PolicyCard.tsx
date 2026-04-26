@@ -1,8 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Policy } from '@/types';
-import { FileText, Eye, DollarSign, Calendar, MapPin, Shield, FileCheck, Mail, User, Phone } from 'lucide-react';
+import { FileText, Eye, DollarSign, Calendar, MapPin, Shield, FileCheck, Mail, User, Phone, MessageSquare, Send, X } from 'lucide-react';
 import { addNotification } from '@/lib/notifications';
 
 interface PolicyCardProps {
@@ -12,6 +13,9 @@ interface PolicyCardProps {
 
 export function PolicyCard({ policy, onViewDetails }: PolicyCardProps) {
   const router = useRouter();
+  const [showMessageBox, setShowMessageBox] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
 
   const getStatusBadge = (status: string) => {
     const s = status?.toLowerCase() || '';
@@ -53,18 +57,49 @@ export function PolicyCard({ policy, onViewDetails }: PolicyCardProps) {
     ? `${address.city}, ${address.state} ${address.zipCode}`
     : '';
 
-  const handleAgentEmailClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleAgentEmailClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-
+    event.stopPropagation();
+    
     if (!policy.agent?.email) return;
+    
+    setShowMessageBox(true);
+  };
 
-    addNotification({
-      type: 'agent',
-      title: 'Agent Email Sent',
-      message: `Email sent to your assigned agent <span class="font-bold text-gray-800">${policy.agent.name}</span> for policy <span class="font-bold text-gray-800">${policy.policyNumber}</span>.`,
-      policyNumber: policy.policyNumber,
-    });
-    alert('Email sent successfully!');
+  const handleSendMessage = async () => {
+    if (!message.trim() || !policy.agent?.email) return;
+    
+    setIsSending(true);
+    
+    try {
+      // Simulate sending email
+      console.log(`Email sent to ${policy.agent.email}: ${message}`);
+      
+      // Add notification
+      addNotification({
+        type: 'agent',
+        title: 'Message Sent',
+        message: `Your message has been sent to <span class="font-bold text-gray-800">${policy.agent.name}</span> for policy <span class="font-bold text-gray-800">${policy.policyNumber}</span>.`,
+        policyNumber: policy.policyNumber,
+      });
+      
+      // Show success alert
+      alert('Message sent successfully!');
+      
+      // Reset form
+      setMessage('');
+      setShowMessageBox(false);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleCancelMessage = () => {
+    setMessage('');
+    setShowMessageBox(false);
   };
 
   return (
@@ -153,14 +188,13 @@ export function PolicyCard({ policy, onViewDetails }: PolicyCardProps) {
               </div>
             </div>
             {policy.agent.email && (
-              <a 
-                href={`mailto:${policy.agent.email}`}
+              <button 
                 onClick={handleAgentEmailClick}
                 className="p-2 rounded-full bg-white text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm border border-blue-100"
                 title={`Email agent: ${policy.agent.name}`}
               >
                 <Mail className="w-4 h-4" />
-              </a>
+              </button>
             )}
           </div>
         </div>
@@ -193,6 +227,77 @@ export function PolicyCard({ policy, onViewDetails }: PolicyCardProps) {
           <span>Details</span>
         </button>
       </div>
+      
+      {/* Message Box Modal */}
+      {showMessageBox && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-bold text-gray-900">Send Message to Agent</h3>
+              </div>
+              <button
+                onClick={handleCancelMessage}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">
+                Send a message to <span className="font-semibold">{policy.agent?.name}</span>
+              </p>
+              <p className="text-xs text-gray-500 mb-3">
+                Policy: {policy.policyNumber}
+              </p>
+            </div>
+            
+            <div className="mb-4">
+              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                Your Message
+              </label>
+              <textarea
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Write your query here..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-gray-900"
+                rows={4}
+                disabled={isSending}
+              />
+            </div>
+            
+            <div className="flex gap-2">
+              <button
+                onClick={handleSendMessage}
+                disabled={!message.trim() || isSending}
+                className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
+              >
+                {isSending ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>Send</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={handleCancelMessage}
+                disabled={isSending}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
