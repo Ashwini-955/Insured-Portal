@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { sanitizeEmail, validateEmail } = require('../utils/validation');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'insured-portal-secret-key';
 
@@ -7,45 +8,44 @@ const JWT_SECRET = process.env.JWT_SECRET || 'insured-portal-secret-key';
  * POST /api/auth/login
  * Input:  { email }
  * Output: { success, token, user }
- *
- * Policies, claims, billing are fetched separately:
- * 1) GET /api/policies/email/:email
- * 2) GET /api/claims?policyNumbers=...
- * 3) GET /api/billing?policyNumbers=...
  */
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { email } = req.body;
 
+    // Validate input
     if (!email || typeof email !== 'string') {
-      return res.status(400).json({
-        success: false,
-        message: 'Email is required'
-      });
+      const error = new Error('Email is required');
+      error.status = 400;
+      throw error;
     }
 
-    const unescapedEmail = email.trim().toLowerCase();
+    const sanitizedEmail = sanitizeEmail(email);
 
-    const user = await User.findOne({ email: new RegExp('^' + unescapedEmail + '$', 'i') });
+    if (!validateEmail(sanitizedEmail)) {
+      const error = new Error('Invalid email format');
+      error.status = 400;
+      throw error;
+    }
+
+    const user = await User.findOne({ email: new RegExp('^' + sanitizedEmail + '$', 'i') }).lean();
     
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'No account with this email'
-      });
+      const error = new Error('No account with this email');
+      error.status = 404;
+      throw error;
     }
 
     if (user.isActive === false) {
-      return res.status(403).json({
-        success: false,
-        message: 'Account is deactivated'
-      });
+      const error = new Error('Account is deactivated');
+      error.status = 403;
+      throw error;
     }
 
-    // 2. Generate JWT
+    // Generate JWT
     const token = jwt.sign(
-      { userId: user._id || 'mock_id', email: user.email },
+      { userId: user._id?.toString() || 'mock_id', email: user.email },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -54,18 +54,14 @@ const login = async (req, res) => {
       success: true,
       token,
       user: {
-        firstName: user.firstName,
-        lastName: user.lastName,
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
         email: user.email
       }
     });
 
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Login failed'
-    });
+    next(error);
   }
 };
 

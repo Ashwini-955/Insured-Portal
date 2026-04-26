@@ -1,6 +1,7 @@
 const Policy = require('../models/Policy');
 const User = require('../models/User');
 const fallbackPolicies = require('../data/policies.json');
+const { sanitizeEmail, validateEmail } = require('../utils/validation');
 
 const getCommunicationValue = (communications = [], typeAliases = []) => {
   if (!Array.isArray(communications)) return '';
@@ -14,14 +15,24 @@ const getCommunicationValue = (communications = [], typeAliases = []) => {
   return match?.Value || match?.value || '';
 };
 
-const getPoliciesByEmail = async (req, res) => {
+const getPoliciesByEmail = async (req, res, next) => {
   try {
     const email = (req.params.email || '').trim().toLowerCase();
+    
     if (!email) {
-      return res.status(400).json({ success: false, message: 'Email is required' });
+      const error = new Error('Email is required');
+      error.status = 400;
+      throw error;
     }
 
-    const matched = await Policy.find({ 'insured.email': new RegExp('^' + email + '$', 'i') }).lean();
+    if (!validateEmail(email)) {
+      const error = new Error('Invalid email format');
+      error.status = 400;
+      throw error;
+    }
+
+    const sanitizedEmail = sanitizeEmail(email);
+    const matched = await Policy.find({ 'insured.email': new RegExp('^' + sanitizedEmail + '$', 'i') }).lean();
 
     const transformedPolicies = matched.map(p => {
       const policyNumber = p.PolicyNumber || p.policyNumber;
@@ -59,8 +70,7 @@ const getPoliciesByEmail = async (req, res) => {
         derivedPolicyType = 'Home Insurance';
       }
 
-      // Extract agent information. Data may come from raw JSON (Agent/Communications)
-      // or Mongo documents shaped by the schema (agent/communications).
+      // Extract agent information
       const rawAgent = p.Agent || p.agent || fallbackPolicy?.Agent || fallbackPolicy?.agent;
       let transformedAgent = null;
       if (rawAgent) {
@@ -92,10 +102,9 @@ const getPoliciesByEmail = async (req, res) => {
     });
 
     if (!transformedPolicies || transformedPolicies.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'No policies found for this email'
-      });
+      const error = new Error('No policies found for this email');
+      error.status = 404;
+      throw error;
     }
 
     res.status(200).json({
@@ -104,11 +113,9 @@ const getPoliciesByEmail = async (req, res) => {
       data: transformedPolicies
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+    next(error);
   }
 };
 
 module.exports = { getPoliciesByEmail };
+

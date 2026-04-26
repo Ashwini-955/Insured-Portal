@@ -122,6 +122,7 @@ export function Chatbot() {
   const [claims, setClaims] = useState<Claim[]>([]);
   const [billing, setBilling] = useState<Billing[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const loadedForEmailRef = useRef<string | null>(null);
@@ -139,14 +140,16 @@ export function Chatbot() {
     if (!isOpen || !user?.email || loadedForEmailRef.current === user.email) return;
 
     const controller = new AbortController();
+    const userEmail = user.email;
 
     async function loadChatbotData() {
       setIsLoadingData(true);
       setDataError(null);
 
       try {
-        const userPolicies = await getPoliciesByEmail(user.email, controller.signal);
+        const userPolicies = await getPoliciesByEmail(userEmail, controller.signal);
         const numbers = userPolicies.map((policy) => policy.policyNumber).filter(Boolean);
+
         const [userClaims, userBilling] = await Promise.all([
           getClaimsByPolicyNumbers(numbers, controller.signal),
           getBillingByPolicyNumbers(numbers, controller.signal),
@@ -155,7 +158,7 @@ export function Chatbot() {
         setPolicies(userPolicies);
         setClaims(userClaims);
         setBilling(userBilling);
-        loadedForEmailRef.current = user.email;
+        loadedForEmailRef.current = userEmail;
       } catch (error) {
         if (error instanceof Error && error.name === "AbortError") return;
         setDataError(error instanceof Error ? error.message : "Unable to load account details.");
@@ -309,29 +312,80 @@ export function Chatbot() {
   const detectIntent = (message: string): Intent | null => {
     const text = normalize(message);
 
+    if (
+      text.includes("cover") ||
+      text.includes("covered") ||
+      text.includes("coverage")
+    ) {
+      return null;
+    }
+
     if (text.includes("how many") && text.includes("polic")) return "policy_count";
     if (text.includes("active") && text.includes("polic")) return "active_policies";
-    if ((text.includes("expired") || text.includes("cancel")) && text.includes("polic")) return "expired_policies";
-    if (text.includes("polic")) return "policy_details";
+
+    if ((text.includes("expired") || text.includes("cancel")) && text.includes("polic")) {
+      return "expired_policies";
+    }
+
+    if (
+      text.includes("policy details") ||
+      text.includes("show my policy") ||
+      text.includes("show my policies") ||
+      text.includes("my policies")
+    ) {
+      return "policy_details";
+    }
+
     if (text.includes("pending") && text.includes("claim")) return "pending_claims";
     if (text.includes("active") && text.includes("claim")) return "active_claims";
     if (text.includes("approved") && text.includes("claim")) return "approved_claims";
     if (text.includes("rejected") && text.includes("claim")) return "rejected_claims";
-    if ((text.includes("pending") || text.includes("due")) && text.includes("payment")) return "pending_payments";
-    if (text.includes("next") && (text.includes("payment") || text.includes("premium"))) return "next_payment_due";
+
+    if ((text.includes("pending") || text.includes("due")) && text.includes("payment")) {
+      return "pending_payments";
+    }
+
+    if (text.includes("next") && (text.includes("payment") || text.includes("premium"))) {
+      return "next_payment_due";
+    }
+
     if (text.includes("history") && text.includes("payment")) return "payment_history";
 
     return null;
   };
 
-  const sendBotResponse = useCallback(
-    (answer: string) => {
-      window.setTimeout(() => {
-        setMessages((current) => [...current, createMessage("bot", answer)]);
-      }, 250);
-    },
-    []
+  const sendBotResponse = useCallback((answer: string) => {
+    window.setTimeout(() => {
+      setMessages((current) => [...current, createMessage("bot", answer)]);
+    }, 250);
+  }, []);
+
+  const getRagAnswer = async (message: string) => {
+    const response = await fetch("http://localhost:5000/api/chat/rag", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message,
+        email: user?.email,
+      }),
+    });
+
+    if (!response.ok) {
+  const errorData = await response.json().catch(() => null);
+
+  throw new Error(
+    errorData?.message ||
+      errorData?.error ||
+      `Request failed with status ${response.status}`
   );
+}
+
+    const data = await response.json();
+
+    return data.answer || "I could not generate an answer.";
+  };
 
   const handleCategoryClick = (category: QuickCategory) => {
     setSelectedCategory(category.key);
@@ -347,11 +401,20 @@ export function Chatbot() {
     sendBotResponse(getIntentAnswer(option.intent));
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     const trimmedValue = inputValue.trim();
-    if (!trimmedValue) return;
+    if (!trimmedValue || isSending) return;
+
+    if (!user?.email) {
+      setMessages((current) => [
+        ...current,
+        createMessage("bot", "Please log in first so I can answer using your account details."),
+      ]);
+      return;
+    }
 
     const matchedIntent = detectIntent(trimmedValue);
+
     setInputValue("");
     setMessages((current) => [...current, createMessage("user", trimmedValue)]);
 
@@ -360,10 +423,32 @@ export function Chatbot() {
       return;
     }
 
-    sendBotResponse(
-      "I can help with policies, claims, and payments. Choose a quick action above, or ask things like \"Which claims are pending?\""
-    );
-  };
+    try {
+  setIsSending(true);
+  setMessages((current) => [...current, createMessage("bot", "Thinking...")]);
+
+  const ragAnswer = await getRagAnswer(trimmedValue);
+
+  setMessages((current) => [
+    ...current.slice(0, -1),
+    createMessage("bot", ragAnswer),
+  ]);
+} catch (error) {
+  console.error("Chatbot frontend error:", error);
+
+  setMessages((current) => [
+    ...current.slice(0, -1),
+    createMessage(
+      "bot",
+      error instanceof Error
+        ? `Something went wrong: ${error.message}`
+        : "Something went wrong. Please try again in a moment."
+    ),
+  ]);
+} finally {
+  setIsSending(false);
+}
+  }
 
   return (
     <div className="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6">
@@ -474,7 +559,7 @@ export function Chatbot() {
             />
             <button
               type="submit"
-              disabled={!inputValue.trim()}
+              disabled={!inputValue.trim() || isSending}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
               aria-label="Send message"
             >

@@ -1,15 +1,26 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { sanitizeString } = require('../utils/validation');
 
-const analyzeImages = async (req, res) => {
+const analyzeImages = async (req, res, next) => {
   try {
     const { images } = req.body;
 
     if (!images || !Array.isArray(images) || images.length === 0) {
-      return res.status(400).json({ success: false, message: 'No images provided' });
+      const error = new Error('No images provided');
+      error.status = 400;
+      throw error;
+    }
+
+    if (images.length > 5) {
+      const error = new Error('Maximum 5 images allowed');
+      error.status = 400;
+      throw error;
     }
 
     if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ success: false, message: 'GEMINI_API_KEY is not configured' });
+      const error = new Error('GEMINI_API_KEY is not configured');
+      error.status = 500;
+      throw error;
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -38,15 +49,14 @@ Make it concise (2-4 sentences max). Focus purely on observable damage. Do not m
 
     const result = await model.generateContent([prompt, ...imageParts]);
     const response = await result.response;
-    const text = response.text();
+    const text = sanitizeString(response.text());
 
-    return res.status(200).json({ success: true, description: text });
-  } catch (error) {
-    console.error('AI Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: error.message || 'Failed to generate AI description',
+    return res.status(200).json({
+      success: true,
+      description: text
     });
+  } catch (error) {
+    next(error);
   }
 };
 
