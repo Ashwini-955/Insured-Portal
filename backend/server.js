@@ -1,18 +1,16 @@
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
-const path = require("path");
 
 const connectDB = require("./config/db");
 const validateEnv = require("./utils/validateEnv");
 const errorHandler = require("./middleware/errorHandler");
 const requestLogger = require("./middleware/logger");
 
-const { buildUserContext } = require("./services/userContextService");
+const { buildCategoryContext } = require("./services/userContextService");
 const { generateAnswer } = require("./services/llmService");
 
-// Load env
-dotenv.config({ path: path.join(__dirname, ".env") });
 
 // Validate environment variables
 validateEnv();
@@ -75,7 +73,7 @@ function isGeminiLimitError(error) {
 
 // 🔹 RAG FULL CHAT ROUTE (Gemini + Real User Data)
 app.post("/api/chat/rag", async (req, res) => {
-  const { message, email } = req.body;
+  const { message, email, category } = req.body;
 
   try {
     if (!message || typeof message !== "string" || message.trim().length === 0) {
@@ -92,23 +90,24 @@ app.post("/api/chat/rag", async (req, res) => {
       });
     }
 
-    const userContext = await buildUserContext(email.trim());
+    if (!category || typeof category !== "string" || !["policies","claims","billing","others"].includes(category)) {
+      return res.status(400).json({
+        success: false,
+        message: "Category is required and must be one of policies, claims, billing, others",
+      });
+    }
 
-    const finalContext = `
-User Account Data:
-${userContext}
-`;
+    // Build context based on category
+    const { context, sources } = await buildCategoryContext(email.trim(), category);
+    const finalContext = `\nUser Account Data (${category}):\n${context}\n`;
 
     let answer;
-
     try {
       answer = await generateAnswer(message.trim(), finalContext);
     } catch (llmError) {
       console.error("LLM error inside /api/chat/rag:", llmError);
-
       if (isGeminiLimitError(llmError)) {
-        answer =
-          "Limit exceeded - can't generate response right now. Please try again later.";
+        answer = "Limit exceeded - can't generate response right now. Please try again later.";
       } else {
         answer = "Something went wrong while generating the response.";
       }
@@ -117,24 +116,17 @@ ${userContext}
     // Extra safety: if llmService returns raw Gemini error text instead of throwing
     if (
       typeof answer === "string" &&
-      (answer.includes("[GoogleGenerativeAI Error]") ||
-        answer.includes("Too Many Requests") ||
-        answer.includes("quota"))
+      (answer.includes("[GoogleGenerativeAI Error]") || answer.includes("Too Many Requests") || answer.includes("quota"))
     ) {
-      answer =
-        "Limit exceeded - can't generate response right now. Please try again later.";
+      answer = "Limit exceeded - can't generate response right now. Please try again later.";
     }
 
     return res.json({
       success: true,
       userQuestion: message,
+      category,
       answer: answer || "I couldn't generate an answer. Please try again.",
-      sources: [
-        {
-          title: "Real User Account Data",
-          type: "mongodb",
-        },
-      ],
+      sources,
     });
   } catch (error) {
     console.error("RAG route error:", error);
@@ -143,8 +135,8 @@ ${userContext}
       return res.json({
         success: true,
         userQuestion: message,
-        answer:
-          "Limit exceeded - can't generate response right now. Please try again later.",
+        category,
+        answer: "Limit exceeded - can't generate response right now. Please try again later.",
         sources: [],
       });
     }
