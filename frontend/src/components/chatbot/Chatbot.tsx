@@ -15,17 +15,26 @@ import { formatDate } from "@/utils/formatDate";
 type Sender = "bot" | "user";
 type CategoryKey = "policies" | "claims" | "payments";
 type Intent =
+  | "greeting"
+  | "help"
+  | "account_summary"
   | "policy_count"
   | "active_policies"
   | "expired_policies"
   | "policy_details"
+  | "coverage_details"
+  | "agent_details"
+  | "property_address"
+  | "billing_summary"
   | "pending_claims"
   | "active_claims"
   | "approved_claims"
   | "rejected_claims"
+  | "claim_details"
   | "pending_payments"
   | "next_payment_due"
-  | "payment_history";
+  | "payment_history"
+  | "recurring_payment";
 
 interface ChatMessage {
   id: string;
@@ -52,7 +61,8 @@ const quickCategories: QuickCategory[] = [
     options: [
       { label: "How many policies do I have?", intent: "policy_count" },
       { label: "Which policies are active?", intent: "active_policies" },
-      { label: "Which policies are expired?", intent: "expired_policies" },
+      { label: "What coverage do I have?", intent: "coverage_details" },
+      { label: "Who is my agent?", intent: "agent_details" },
       { label: "Show my policy details", intent: "policy_details" },
     ],
   },
@@ -64,6 +74,7 @@ const quickCategories: QuickCategory[] = [
       { label: "Which claims are active?", intent: "active_claims" },
       { label: "Which claims are approved?", intent: "approved_claims" },
       { label: "Which claims are rejected?", intent: "rejected_claims" },
+      { label: "Show all claim details", intent: "claim_details" },
     ],
   },
   {
@@ -73,6 +84,7 @@ const quickCategories: QuickCategory[] = [
       { label: "Is any payment pending?", intent: "pending_payments" },
       { label: "What is my next payment due?", intent: "next_payment_due" },
       { label: "Show my payment history", intent: "payment_history" },
+      { label: "Show billing summary", intent: "billing_summary" },
     ],
   },
 ];
@@ -85,6 +97,7 @@ const createMessage = (sender: Sender, text: string): ChatMessage => ({
 });
 
 const normalize = (value?: string | null) => (value || "").trim().toLowerCase();
+const hasAny = (text: string, words: string[]) => words.some((word) => text.includes(word));
 
 const isPolicyActive = (policy: Policy) => {
   const status = normalize(policy.status);
@@ -110,13 +123,23 @@ const getClaimMatches = (claims: Claim[], keyword: string) =>
 const listLines = (items: string[], emptyText: string) =>
   items.length > 0 ? items.map((item, index) => `${index + 1}. ${item}`).join("\n") : emptyText;
 
+const formatAddress = (policy: Policy) => {
+  const address = policy.propertyAddress;
+  if (!address) return "";
+
+  return [address.addressLine1, address.city, address.state, address.zipCode].filter(Boolean).join(", ");
+};
+
 export function Chatbot() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey>("policies");
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([
-    createMessage("bot", "Hi, I am your assistant. Choose a topic or type your question."),
+    createMessage(
+      "bot",
+      "Hi, I can answer questions about your policies, claims, coverage, agent, billing, due dates, and payment history. Type anything or choose a topic."
+    ),
   ]);
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [claims, setClaims] = useState<Claim[]>([]);
@@ -139,13 +162,14 @@ export function Chatbot() {
     if (!isOpen || !user?.email || loadedForEmailRef.current === user.email) return;
 
     const controller = new AbortController();
+    const email = user.email;
 
     async function loadChatbotData() {
       setIsLoadingData(true);
       setDataError(null);
 
       try {
-        const userPolicies = await getPoliciesByEmail(user.email, controller.signal);
+        const userPolicies = await getPoliciesByEmail(email, controller.signal);
         const numbers = userPolicies.map((policy) => policy.policyNumber).filter(Boolean);
         const [userClaims, userBilling] = await Promise.all([
           getClaimsByPolicyNumbers(numbers, controller.signal),
@@ -155,7 +179,7 @@ export function Chatbot() {
         setPolicies(userPolicies);
         setClaims(userClaims);
         setBilling(userBilling);
-        loadedForEmailRef.current = user.email;
+        loadedForEmailRef.current = email;
       } catch (error) {
         if (error instanceof Error && error.name === "AbortError") return;
         setDataError(error instanceof Error ? error.message : "Unable to load account details.");
@@ -186,8 +210,18 @@ export function Chatbot() {
       const approvedClaims = getClaimMatches(claims, "approved");
       const rejectedClaims = getClaimMatches(claims, "rejected");
       const dueBills = billing.filter((bill) => Number(bill.currentAmountDue || 0) > 0);
+      const totalBalance = billing.reduce((sum, bill) => sum + Number(bill.accountTotalBalance || 0), 0);
 
       switch (intent) {
+        case "greeting":
+          return "Hi. Ask me anything about your policies, claims, payments, coverage, agent, due dates, or account summary.";
+
+        case "help":
+          return "You can ask questions like: What policies do I have? Who is my agent? What coverage do I have? Are any payments due? What is my claim status?";
+
+        case "account_summary":
+          return `Account summary: ${policies.length} polic${policies.length === 1 ? "y" : "ies"}, ${activePolicies.length} active, ${claims.length} claim${claims.length === 1 ? "" : "s"}, and ${formatCurrency(totalBalance)} total billing balance.`;
+
         case "policy_count":
           return `You have ${policies.length} polic${policies.length === 1 ? "y" : "ies"}. ${activePolicies.length} active, ${expiredPolicies.length} expired.`;
 
@@ -216,6 +250,51 @@ export function Chatbot() {
                 `${policy.policyNumber} - ${policy.policyType || "Insurance"} - ${policy.status || "Active"} - ${formatDate(policy.effectiveDate)} to ${formatDate(policy.expirationDate)}`
             ),
             "I could not find any policies for your account."
+          );
+
+        case "coverage_details":
+          return listLines(
+            policies.map((policy) => {
+              const coverageText =
+                policy.coverages && policy.coverages.length > 0
+                  ? policy.coverages
+                      .map((coverage) =>
+                        `${coverage.name || "Coverage"}${coverage.limit ? ` ${formatCurrency(Number(coverage.limit))}` : ""}`
+                      )
+                      .join(", ")
+                  : "No coverage details listed";
+
+              return `${policy.policyNumber} - ${coverageText}`;
+            }),
+            "I could not find coverage details for your policies."
+          );
+
+        case "agent_details":
+          return listLines(
+            policies.map((policy) => {
+              const agent = policy.agent;
+              if (!agent?.name && !agent?.phone && !agent?.email) {
+                return `${policy.policyNumber} - no agent details listed`;
+              }
+
+              return `${policy.policyNumber} - ${[agent?.name, agent?.phone, agent?.email].filter(Boolean).join(" - ")}`;
+            }),
+            "I could not find agent details for your policies."
+          );
+
+        case "property_address":
+          return listLines(
+            policies.map((policy) => `${policy.policyNumber} - ${formatAddress(policy) || "No property address listed"}`),
+            "I could not find property address details for your policies."
+          );
+
+        case "billing_summary":
+          return listLines(
+            billing.map(
+              (bill) =>
+                `${bill.PolicyNumber} - balance ${formatCurrency(Number(bill.accountTotalBalance || 0))}, current due ${formatCurrency(Number(bill.currentAmountDue || 0))} on ${formatDate(bill.currentDueDate)}`
+            ),
+            "I could not find billing details for your policies."
           );
 
         case "pending_claims":
@@ -252,6 +331,15 @@ export function Chatbot() {
                 `${claim.ClaimNumber} - ${claim.DescriptionOfLoss || "Claim"} - policy ${claim.PolicyNumber}`
             ),
             "You do not have any rejected claims right now."
+          );
+
+        case "claim_details":
+          return listLines(
+            claims.map(
+              (claim) =>
+                `${claim.ClaimNumber} - policy ${claim.PolicyNumber} - ${claim.Status || "Status unavailable"} - ${claim.DescriptionOfLoss || "Claim"}`
+            ),
+            "I could not find any claims for your policies."
           );
 
         case "pending_payments":
@@ -301,6 +389,15 @@ export function Chatbot() {
             "I could not find recent paid statements for your account."
           );
         }
+
+        case "recurring_payment":
+          return listLines(
+            billing.map(
+              (bill) =>
+                `${bill.PolicyNumber} - recurring payment is ${bill.isRecurringPayment ? "enabled" : "not enabled"}${bill.payPlanDesc ? ` (${bill.payPlanDesc})` : ""}`
+            ),
+            "I could not find recurring payment details for your policies."
+          );
       }
     },
     [billing, claims, dataError, isLoadingData, policies]
@@ -309,20 +406,89 @@ export function Chatbot() {
   const detectIntent = (message: string): Intent | null => {
     const text = normalize(message);
 
-    if (text.includes("how many") && text.includes("polic")) return "policy_count";
+    if (hasAny(text, ["hi", "hello", "hey", "good morning", "good afternoon", "good evening"])) return "greeting";
+    if (hasAny(text, ["help", "what can you do", "options", "questions"])) return "help";
+    if (hasAny(text, ["summary", "overview", "account", "dashboard"])) return "account_summary";
+    if (hasAny(text, ["agent", "producer", "representative", "contact person"])) return "agent_details";
+    if (hasAny(text, ["coverage", "coverages", "covered", "limit", "limits"])) return "coverage_details";
+    if (hasAny(text, ["address", "property", "location"]) && !text.includes("claim")) return "property_address";
+    if (hasAny(text, ["balance", "bill", "billing", "invoice", "amount", "premium"])) return "billing_summary";
+    if (hasAny(text, ["autopay", "auto pay", "recurring", "pay plan", "payment plan"])) return "recurring_payment";
+    if (hasAny(text, ["how many", "count", "total", "number of"]) && text.includes("polic")) return "policy_count";
     if (text.includes("active") && text.includes("polic")) return "active_policies";
-    if ((text.includes("expired") || text.includes("cancel")) && text.includes("polic")) return "expired_policies";
+    if (hasAny(text, ["expired", "cancelled", "canceled", "inactive"]) && text.includes("polic")) return "expired_policies";
     if (text.includes("polic")) return "policy_details";
     if (text.includes("pending") && text.includes("claim")) return "pending_claims";
     if (text.includes("active") && text.includes("claim")) return "active_claims";
-    if (text.includes("approved") && text.includes("claim")) return "approved_claims";
-    if (text.includes("rejected") && text.includes("claim")) return "rejected_claims";
-    if ((text.includes("pending") || text.includes("due")) && text.includes("payment")) return "pending_payments";
-    if (text.includes("next") && (text.includes("payment") || text.includes("premium"))) return "next_payment_due";
-    if (text.includes("history") && text.includes("payment")) return "payment_history";
+    if (hasAny(text, ["approved", "paid", "settled"]) && text.includes("claim")) return "approved_claims";
+    if (hasAny(text, ["rejected", "denied", "declined"]) && text.includes("claim")) return "rejected_claims";
+    if (text.includes("claim")) return "claim_details";
+    if (hasAny(text, ["pending", "due", "owed", "unpaid"]) && hasAny(text, ["payment", "premium", "bill", "invoice"])) return "pending_payments";
+    if (hasAny(text, ["next", "upcoming", "when"]) && hasAny(text, ["payment", "premium", "bill", "due"])) return "next_payment_due";
+    if (hasAny(text, ["history", "past", "previous", "paid"]) && hasAny(text, ["payment", "premium", "bill", "invoice"])) return "payment_history";
 
     return null;
   };
+
+  const getSmartFallbackAnswer = useCallback(
+    (message: string) => {
+      const text = normalize(message);
+
+      if (isLoadingData) {
+        return "I am loading your account details. Please try again in a moment.";
+      }
+
+      if (dataError) {
+        return `I could not load your account details right now. ${dataError}`;
+      }
+
+      const matchedPolicy = policies.find((policy) => text.includes(normalize(policy.policyNumber)));
+      if (matchedPolicy) {
+        const bill = billing.find((item) => item.PolicyNumber === matchedPolicy.policyNumber);
+        const policyClaims = claims.filter((claim) => claim.PolicyNumber === matchedPolicy.policyNumber);
+        const address = formatAddress(matchedPolicy);
+
+        return [
+          `${matchedPolicy.policyNumber} - ${matchedPolicy.policyType || "Insurance"} - ${matchedPolicy.status || "Status unavailable"}`,
+          `Dates: ${formatDate(matchedPolicy.effectiveDate)} to ${formatDate(matchedPolicy.expirationDate)}`,
+          matchedPolicy.agent ? `Agent: ${[matchedPolicy.agent.name, matchedPolicy.agent.phone, matchedPolicy.agent.email].filter(Boolean).join(" - ")}` : "",
+          address ? `Property: ${address}` : "",
+          bill ? `Billing: ${formatCurrency(Number(bill.currentAmountDue || 0))} due ${formatDate(bill.currentDueDate)}` : "",
+          `Claims: ${policyClaims.length}`,
+        ]
+          .filter(Boolean)
+          .join("\n");
+      }
+
+      const matchedClaim = claims.find((claim) => text.includes(normalize(claim.ClaimNumber)));
+      if (matchedClaim) {
+        return [
+          `${matchedClaim.ClaimNumber} - ${matchedClaim.Status || "Status unavailable"}`,
+          `Policy: ${matchedClaim.PolicyNumber}`,
+          `Loss: ${matchedClaim.DescriptionOfLoss || "No description listed"}`,
+          `Received: ${formatDate(matchedClaim.ReceivedDate)}`,
+          matchedClaim.MainAdjusterName ? `Adjuster: ${matchedClaim.MainAdjusterName}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n");
+      }
+
+      const topicMatches: Array<{ label: string; intent: Intent; score: number }> = [
+        { label: "account summary", intent: "account_summary" as const, score: hasAny(text, ["my", "me", "i", "account"]) ? 1 : 0 },
+        { label: "policy details", intent: "policy_details" as const, score: hasAny(text, ["policy", "policies", "insurance"]) ? 2 : 0 },
+        { label: "claim details", intent: "claim_details" as const, score: hasAny(text, ["claim", "loss", "adjuster"]) ? 2 : 0 },
+        { label: "billing details", intent: "billing_summary" as const, score: hasAny(text, ["pay", "payment", "bill", "billing", "money", "premium", "due"]) ? 2 : 0 },
+        { label: "agent details", intent: "agent_details" as const, score: hasAny(text, ["call", "email", "phone", "contact", "agent"]) ? 2 : 0 },
+      ].sort((a, b) => b.score - a.score);
+
+      if (topicMatches[0]?.score > 0) {
+        return getIntentAnswer(topicMatches[0].intent);
+      }
+
+      return "I can answer account questions using your portal data: policies, coverage, agents, claims, billing, due dates, payment history, and autopay. Try asking your question with a policy number, claim number, or one of those topics.";
+    },
+    [billing, claims, dataError, getIntentAnswer, isLoadingData, policies]
+  );
 
   const sendBotResponse = useCallback(
     (answer: string) => {
@@ -360,9 +526,7 @@ export function Chatbot() {
       return;
     }
 
-    sendBotResponse(
-      "I can help with policies, claims, and payments. Choose a quick action above, or ask things like \"Which claims are pending?\""
-    );
+    sendBotResponse(getSmartFallbackAnswer(trimmedValue));
   };
 
   return (
