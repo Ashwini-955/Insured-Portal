@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Bot, ChevronRight, MessageCircle, Send, User, X } from "lucide-react";
+import { Bot, ChevronRight, Maximize2, Minimize2, MessageCircle, Send, User, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import {
   getBillingByPolicyNumbers,
@@ -113,6 +113,7 @@ const listLines = (items: string[], emptyText: string) =>
 export function Chatbot() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey>("policies");
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -369,10 +370,14 @@ export function Chatbot() {
     <div className="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6">
       {isOpen && (
         <section
-          className="mb-4 flex h-[500px] max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20 transition-all duration-300 sm:w-[350px]"
+          className={`flex flex-col overflow-hidden bg-white shadow-2xl shadow-slate-900/20 transition-all duration-300 ${
+            isFullScreen
+              ? "fixed inset-0 z-50 h-[100dvh] w-screen rounded-none sm:inset-4 sm:h-[calc(100dvh-2rem)] sm:w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-slate-200"
+              : "mb-4 h-[500px] max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] rounded-2xl border border-slate-200 sm:w-[350px]"
+          }`}
           aria-label="Assistant chatbot"
         >
-          <header className="flex items-center gap-3 bg-slate-950 px-4 py-3 text-white">
+          <header className="flex items-center gap-2 bg-slate-950 px-4 py-3 text-white sm:gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
               <Bot className="h-5 w-5" aria-hidden="true" />
             </div>
@@ -380,6 +385,18 @@ export function Chatbot() {
               <h2 className="truncate text-sm font-semibold">Assistant</h2>
               <p className="truncate text-xs text-slate-300">How can I help you?</p>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsFullScreen((prev) => !prev)}
+              className="rounded-lg p-2 text-slate-300 transition hover:bg-white/10 hover:text-white"
+              aria-label={isFullScreen ? "Minimize chatbot" : "Maximize chatbot"}
+            >
+              {isFullScreen ? (
+                <Minimize2 className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Maximize2 className="h-4 w-4" aria-hidden="true" />
+              )}
+            </button>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
